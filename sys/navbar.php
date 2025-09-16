@@ -1,4 +1,4 @@
-
+<!-- 
 
 <style>
     :root {
@@ -161,5 +161,73 @@
             </span>
             POS
         </a>
+    </div>
+</nav> -->
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+
+        <?php
+        $url = parse_url($_SERVER['REQUEST_URI']);
+        if(str_contains($url['path'], "dashboard")){
+            echo "الصفحة الرئيسية";
+        }else if(str_contains($url['path'], "products")){
+            echo "الاصناف";
+        }else if(str_contains($url['path'], "category")){
+            echo "الفئة";
+        }
+        
+        ?>
+
+
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="./dashboard.php">الصفحة الرئيسية</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="./products.php">الاصناف/products</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="./category.php">الفئة/category</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">العملاء/customers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">المستخدمين/users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">الفواتير/bills</a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        المزيد
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">الرصيد اليومي</a></li>
+                        <li><a class="dropdown-item" href="#">تقرير الارباح اليومية</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#">logout</a></li>
+                    </ul>
+                </li>
+                <!-- <li class="nav-item">
+                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                </li> -->
+            </ul>
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" style="text-align: center;" type="number" readonly placeholder="Dollar"/>
+                &nbsp;
+                <button class="btn btn-outline-warning" type="submit">Logout</button>
+            </form>
+        </div>
     </div>
 </nav>

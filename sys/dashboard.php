@@ -120,6 +120,8 @@
             color: var(--text);
         }
     </style>
+    <link href="../common/bootstrap.css" rel="stylesheet">
+
 </head>
 
 <body>
@@ -127,13 +129,15 @@
     <?php include_once 'check.php' ?>
     <?php include_once './onlyAdmin.php' ?>
 
-    <div class="grid">
-        <div class="grid1">
+    <!-- <div class="grid"> -->
+        <!-- <div class="grid1"> -->
             <?php include_once 'navbar.php' ?>
 
-        </div>
-        <br>
-        <div class="grid2" id="grid2" style="text-align:center;">
+        <!-- </div> -->
+<br>
+
+        <!-- <div class="grid2" id="grid2" style="text-align:center;"> -->
+            <!-- <input type="number" style="width: 100px;" readonly placeholder="Dollar" step="0.01" class="form-control"> -->
 
             <div class="container">
                 <div class="card">
@@ -169,8 +173,8 @@
                 </div>
             </div>
 
-        </div>
+        <!-- </div> -->
     </div>
 </body>
-
+<script src="../common/bootstrap.js"></script>
 </html>

@@ -47,16 +47,38 @@ function validateInput($input, $type, $min = null, $max = null)
 }
 
 if (isset($_GET['editProduct'])) {
-    // prost cannot be echoed but get yes you still here in this code in the next time continue from here 
+    // post cannot be echoed but get yes you still here in this code in the next time continue from here 
     // till now you do not have errors continue greatelly
+
+
     $name = $_GET['productName'];
     $barcode = $_GET['barcode'];
     $cost_price = $_GET['costPrice'];
     $price = $_GET['price'];
     $stock_quantity = $_GET['stockQuantity'];
-    $category_id = $_GET['categoryId'];
-    echo $name . $barcode.$cost_price.$price.$stock_quantity.$category_id;
+    $category = $_GET['categoryId'];
+    $id  = $_GET['productId'];
 
+    if (!validateInput($cost_price, 'float')) {
+        header("Location: ./products.php?error=input error cost price should be a number");
+    } else if (!validateInput($price, 'float')) {
+        header("Location: ./products.php?error=input error price should be a number");
+    } else if (!validateInput($stock_quantity, 'float')) {
+        header("Location: ./products.php?error=input error stock quantity should be a number");
+    }
+
+    $sql = "UPDATE products SET name = :name, barcode = :barcode, price = :price, cost_price = :costprice, stock_quantity = :stock_quantity, category = :category WHERE id = :id";
+    $editProduct = $db->prepare($sql);
+    $editProduct->bindParam(':name', $name);
+    $editProduct->bindParam(':barcode', $barcode);
+    $editProduct->bindParam(':price', $price);
+    $editProduct->bindParam(':costprice', $cost_price);
+    $editProduct->bindParam(':stock_quantity', $stock_quantity);
+    $editProduct->bindParam(':category', $category);
+    $editProduct->bindParam(':id', $id);
+    if ($editProduct->execute()) {
+        header('Location: ./products.php');
+    }
 } else {
     header("Location: ../notAllowed.php");
 }

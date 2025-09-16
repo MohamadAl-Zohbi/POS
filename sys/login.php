@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_start();
             $_SESSION['username'] = $username;
 
-            if ($result[0]->role == "admin") {
+            if ($result[0]['role'] == "admin") {
                 header('Location: dashboard.php');
             } else {
                 header('Location: pos.php');
