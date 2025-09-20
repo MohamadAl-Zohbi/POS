@@ -175,6 +175,8 @@
             echo "الاصناف";
         }else if(str_contains($url['path'], "category")){
             echo "الفئة";
+        }else if(str_contains($url['path'], "users")){
+            echo "المستخدمين";
         }
         
         ?>
@@ -200,7 +202,7 @@
                     <a class="nav-link" href="#">العملاء/customers</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">المستخدمين/users</a>
+                    <a class="nav-link" href="./users.php">المستخدمين/users</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">الفواتير/bills</a>
