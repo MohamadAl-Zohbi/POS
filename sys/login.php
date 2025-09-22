@@ -76,8 +76,8 @@
         <div class="login-container">
             <h2>Login</h2>
             <form method="POST" id="form" action="login.php">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="password" name="password" placeholder="Password" required>
+                <input type="text" name="username" placeholder="Username" required/>
+                <input type="password" name="password" placeholder="Password" autocomplete="section-red shipping street-address" required/>
                 <input type="submit" value="Login">
             </form>
         </div>
