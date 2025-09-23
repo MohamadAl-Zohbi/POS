@@ -220,7 +220,8 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="#">logout</a></li>
+                        <li><a class="dropdown-item" href="#">اغلاق اليوم</a></li>
+                        <li><a class="dropdown-item" href="./pos.php">POS</a></li>
                     </ul>
                 </li>
                 <!-- <li class="nav-item">

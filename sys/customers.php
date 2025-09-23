@@ -25,18 +25,27 @@
 
     // continue here     you should add the buisness logic of the payment 
     if (isset($_GET['amount'])) {
+
         $id = $_GET['id'];
-        $validate = $db->prepare("SELECT * FROM sale_items WHERE product_id=:id");
-        $validate->bindParam(':id', $id);
-        if ($validate->execute()) {
-            $validate = $validate->fetchAll(PDO::FETCH_ASSOC);
-            if (count($validate) == 0) {
-                $deleting = $db->prepare("DELETE FROM products WHERE id=:id");
-                $deleting->bindParam(':id', $id);
-                if ($deleting->execute()) header('Location: products.php');
-            } else {
-                echo '<script>alert("لا يمكن حذف هذا المنتج لانه قيد الاستخدام")</script>';
+        $amount = $_GET['amount'];
+
+        if (is_numeric($amount) & $amount > 0) {
+            $validate = $db->prepare("SELECT balance FROM customers WHERE id=:id");
+            $validate->bindParam(':id', $id);
+            if ($validate->execute()) {
+                $validate = $validate->fetchAll(PDO::FETCH_ASSOC);
+                if (count($validate) == 1) {
+                    $balance = (float)$validate[0]['balance'] + (float)$amount;
+                    $pay = $db->prepare("UPDATE customers SET balance = :balance WHERE id = :id");
+                    $pay->bindParam(':id', $id);
+                    $pay->bindParam(':balance', $balance);
+                    if ($pay->execute()) header('Location: customers.php');
+                } else {
+                    echo '<script>alert("هذا الزبون غير متوفر")</script>';
+                }
             }
+        }else{
+             echo '<script>alert("الرجاء ادخال رقم")</script>';
         }
     }
 
@@ -220,7 +229,7 @@
 
          let url = "customers.php?id=" + encodeURIComponent(id) + "&amount=" + amount;
 
-         window.location.href = url; 
+         window.location.href = url;
      }
 
 

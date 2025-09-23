@@ -1,14 +1,41 @@
+<?php
+include_once '../common/connect.php';
+include_once './check.php';
+
+
+
+
+
+$categories = $db->prepare("SELECT * FROM categories");
+$categoriesList = [];
+if ($categories->execute()) {
+    while ($row = $categories->fetch(\PDO::FETCH_ASSOC)) {
+        array_push($categoriesList, $row);
+    }
+}
+
+$productWithCategory = $db->prepare("SELECT * FROM products WHERE category != ''");
+$productsCategory = [];
+if ($productWithCategory->execute()) {
+    while ($row = $productWithCategory->fetch(\PDO::FETCH_ASSOC)) {
+        array_push($productsCategory, $row);
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
-    <?php include_once 'check.php' ?>
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Modern POS System</title>
+    <link href="../common/bootstrap.css" rel="stylesheet">
+
     <style>
         :root {
             --primary: #007bff;
+            --category: #ddd;
+            --category-text: #000;
             --secondary: #5fa6f1;
             --bg: #f4f6f8;
             --text: #333;
@@ -86,8 +113,8 @@
         }
 
         .product {
-            background: var(--secondary);
-            color: white;
+            background: var(--category);
+            color: var(--category-text);
             padding: 8px;
             border-radius: 6px;
             text-align: center;
@@ -107,7 +134,7 @@
         .product-row {
             /* display: none; */
             /* background-color: red; */
-            border-bottom: 10px solid red !important;
+            /* border-bottom: 10px solid red !important; */
             padding: 100px;
         }
 
@@ -132,7 +159,7 @@
 
         .qtn-button {
             width: 15px;
-            height: 15px;
+            /* height: 15px; */
             padding: 0px;
             font-size: 17px;
             margin: 0px;
@@ -345,22 +372,28 @@
             </div>
         </div>
     </div>
-    <!-- <header>
-        <button>
-            الزبائن / customers
-        </button>
-    </header> -->
-
     <main>
         <section class="products">
             <h2>Products</h2>
             <input type="text" id="barcode" placeholder="Add product by barcode">
+            <select style="text-align: center;" class="form-select" id="category" name="category">
+                <option value="">All</option>
+                <?php
+                foreach ($categoriesList as $i => $item) {
+                    echo '<option value="' . $item["name"] . '">' . $item["name"] . '</option>';
+                }
+                ?>
+            </select>
+
+
             <div class="product-list" id="product-list">
-                <div class="product" data-name="🍎 die32jfio23 foip45jpoti gj4poji op2ig jj" data-price="2">🍎 Appdhwqehfui32ji o4fj4iojfp5o34j gfpo4if4jpfo4ole<br>$2</div>
+                <!-- <div class="product" data-name="🍎 die32jfio23 foip45jpoti gj4poji op2ig jj" data-price="2">🍎 Appdhwqehfui32ji o4fj4iojfp5o34j gfpo4if4jpfo4ole<br>$2</div>
                 <div class="product" data-name="🥛 Milk" data-price="1.5">🥛 Milk<br>$1.5</div>
                 <div class="product" data-name="🍞 Bread" data-price="1.2">🍞 Bread<br>$1.2</div>
-                <div class="product" data-name="🥤 Soda" data-price="1">🥤 Soda<br>$1</div>
+                <div class="product" data-name="🥤 Soda" data-price="1">🥤 Soda<br>$1</div> -->
             </div>
+
+
             <div class="tables">
                 <h2>Tables</h2>
                 <div class="table-list" id="table-list">
@@ -375,7 +408,7 @@
             </div>
         </section>
 
-        <section class="cart">
+        <section class="cart" style="width:600px;">
             <h2>Cart</h2>
             <table class="cart-items product-table" id="cart-items">
 
@@ -437,7 +470,8 @@
             <td class="product-cell">
                 
             </td>    
-            <td class="product-cell action bold">name </td>
+            <td class="product-cell action bold">name</td>
+            <td class="product-cell action bold">quantity</td>
             <td class="product-cell action bold">price</td>
             <td class="product-cell action bold">total</td>
             <td class="product-cell action bold"></td>
@@ -457,7 +491,8 @@
                 <button onclick="addToCart('${name}',${item.price})" class="qtn-button">+</button>
                 <button onclick="removeFromCart('${name}',${item.price})" class="qtn-button">-</button>
             </td>    
-            <td class="product-cell action">${name} x <input onchange="editQty('${name}',this.value)" value="${item.qty}"/> </td>
+            <td class="product-cell action">${truncate(name,10)} x  </td>
+            <td class="product-cell action"><input onchange="editQty('${name}',this.value)" value="${item.qty}"/></td>
             <td class="product-cell action"><span>$<input onchange="editPrice('${name}',this.value)" type="number" value="${item.price.toFixed(2)}"/></span></td>
             <td class="product-cell action">${itemTotal.toFixed(2)}$</td>
             <td class="product-cell action"><button class="remove-btn" onclick="removeItem('${name}')">
@@ -571,6 +606,24 @@
             document.querySelectorAll('.table')[0].classList.add('active');
             setDataInwindows();
         }
+
+        function truncate(str, length = 10) {
+            return str.length > length ? str.substring(0, length) + ".." : str;
+        }
+        let productsWithCategory = <?php echo json_encode($productsCategory); ?>;
+
+        document.getElementById("category").addEventListener("change", () => {
+            document.getElementById("product-list").innerHTML = "";
+            let categoryValue = document.getElementById("category").value;
+            let printProductCategoryInTheCart = productsWithCategory.filter(product => product.category == categoryValue);
+            // console.log(productsWithCategory.filter(product => product.category == categoryValue))
+            printProductCategoryInTheCart.forEach(item => {
+                document.getElementById("product-list").innerHTML +=
+                `
+                <div class="product" data-name="${item['name']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
+                `;
+            });
+        });
     </script>
 </body>
 
