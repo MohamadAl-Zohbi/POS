@@ -416,7 +416,7 @@ if ($productWithCategory->execute()) {
             </table>
             <div class="status">
                 <label><input type="checkbox" id="paid"> Paid</label>
-                <span id="total">Total: $0</span>
+                <span id="total">Total: 0</span>
             </div>
             <input type="text" id="search-invoice" placeholder="Search invoice by ID">
             <button onclick="print()">Print</button>
@@ -439,18 +439,19 @@ if ($productWithCategory->execute()) {
         // Add by barcode (simulate adding first product)
 
 
-        function addToCart(name, price) {
+        function addToCart(name, price, currency) {
             if (cart[name]) cart[name].qty += 1;
             else cart[name] = {
                 price,
-                qty: 1
+                qty: 1,
+                currency
             };
-            updateCart(cart[name], name);
+            updateCart();
         }
 
         function removeFromCart(name, price) {
             if (cart[name].qty > 1) cart[name].qty -= 1;
-            updateCart(cart[name], name);
+            updateCart();
         }
 
 
@@ -474,6 +475,7 @@ if ($productWithCategory->execute()) {
                 let item = cart[name];
                 let itemTotal = item.qty * item.price;
                 total += itemTotal;
+                let currency = item.currency;
                 let div = document.createElement('tr');
                 div.className = 'product-row';
                 div.innerHTML =
@@ -485,8 +487,8 @@ if ($productWithCategory->execute()) {
             </td>    
             <td class="product-cell action">${truncate(name,10)} x  </td>
             <td class="product-cell action"><input onchange="editQty('${name}',this.value)" value="${item.qty}"/></td>
-            <td class="product-cell action"><span>$<input onchange="editPrice('${name}',this.value)" type="number" value="${item.price.toFixed(2)}"/></span></td>
-            <td class="product-cell action">${itemTotal.toFixed(2)}$</td>
+            <td class="product-cell action"><span>${currency == "usd" ? "$":"L" }<input onchange="editPrice('${name}',this.value)" type="number" value="${item.price.toFixed(2)}"/></span></td>
+            <td class="product-cell action">${formatNumber(itemTotal)} ${currency == "usd" ? "$":"L" }</td>
             <td class="product-cell action"><button class="remove-btn" onclick="removeItem('${name}')">
 
                    X
@@ -496,6 +498,8 @@ if ($productWithCategory->execute()) {
         `;
                 itemsDiv.appendChild(div);
             }
+
+            // we are here we should make the total with the usd and LBP
             if (total === 0) itemsDiv.innerHTML = '<p style="color:#777; text-align:center;">Cart is empty</p>';
             document.getElementById('total').textContent = 'Total: $' + total.toFixed(2);
         }
@@ -540,8 +544,8 @@ if ($productWithCategory->execute()) {
         }
 
         function editPrice(name, price) {
-            cart[name].price = price.toFixed(2)
-            updateCart()
+            cart[name].price = parseFloat(price);
+            updateCart();
         }
 
         function setDataInwindows() {
@@ -566,7 +570,7 @@ if ($productWithCategory->execute()) {
         }
 
         function editQty(name, qty) {
-            cart[name].qty = qty
+            cart[name].qty = parseInt(qty);
             updateCart()
         }
 
@@ -610,7 +614,7 @@ if ($productWithCategory->execute()) {
             productsWithCategory.forEach(item => {
                 document.getElementById("product-list").innerHTML +=
                     `
-                <div class="product" data-name="${item['name']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
+                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
                 `;
             });
         }
@@ -622,7 +626,7 @@ if ($productWithCategory->execute()) {
                 let i = 0;
                 productsWithCategory.forEach(item => {
                     if (item['name'] == e.target.value) {
-                        addToCart(item['name'], item['price']);
+                        addToCart(item['name'], item['price'], item['currency']);
                         i++;
                     }
                 });
@@ -641,12 +645,12 @@ if ($productWithCategory->execute()) {
                 productsWithCategory.forEach(item => {
                     document.getElementById("product-list").innerHTML +=
                         `
-                <div class="product" data-name="${item['name']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
+                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
                 `;
                 });
                 document.querySelectorAll('.product').forEach(prod => {
                     prod.addEventListener('click', () => {
-                        addToCart(prod.dataset.name, parseFloat(prod.dataset.price));
+                        addToCart(prod.dataset.name, parseFloat(prod.dataset.price), prod.dataset.currency);
                     });
                 });
                 return true;
@@ -655,22 +659,33 @@ if ($productWithCategory->execute()) {
             printProductCategoryInTheCart.forEach(item => {
                 document.getElementById("product-list").innerHTML +=
                     `
-                <div class="product" data-name="${item['name']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
+                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
                 `;
             });
 
             document.querySelectorAll('.product').forEach(prod => {
                 prod.addEventListener('click', () => {
-                    addToCart(prod.dataset.name, parseFloat(prod.dataset.price));
+                    addToCart(prod.dataset.name, parseFloat(prod.dataset.price), prod.dataset.currency);
                 });
             });
         });
 
         document.querySelectorAll('.product').forEach(prod => {
             prod.addEventListener('click', () => {
-                addToCart(prod.dataset.name, parseFloat(prod.dataset.price));
+                addToCart(prod.dataset.name, parseFloat(prod.dataset.price), prod.dataset.currency);
             });
         });
+
+        function formatNumber(number) {
+            // convert to string and keep only digits, commas, and dots
+            let value = String(number).replace(/[^\d.,]/g, "");
+
+            // format with thousands separator (only on the integer part)
+            let parts = value.split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+            return parts.join(".");
+        }
     </script>
     <script src="../common/bootstrap.js"></script>
 </body>
