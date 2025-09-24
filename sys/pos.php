@@ -14,7 +14,8 @@ if ($categories->execute()) {
     }
 }
 
-$productWithCategory = $db->prepare("SELECT * FROM products WHERE category != ''");
+$productWithCategory = $db->prepare("SELECT * FROM products");
+//  WHERE category != ''
 $productsCategory = [];
 if ($productWithCategory->execute()) {
     while ($row = $productWithCategory->fetch(\PDO::FETCH_ASSOC)) {
@@ -300,7 +301,7 @@ if ($productWithCategory->execute()) {
         }
 
         .modal {
-            background-color: white;
+            background-color: black;
             padding: 20px 30px;
             border-radius: 8px;
             max-width: 400px;
@@ -377,7 +378,7 @@ if ($productWithCategory->execute()) {
             <h2>Products</h2>
             <input type="text" id="barcode" placeholder="Add product by barcode">
             <select style="text-align: center;" class="form-select" id="category" name="category">
-                <option value="">All</option>
+                <option value="all">All</option>
                 <?php
                 foreach ($categoriesList as $i => $item) {
                     echo '<option value="' . $item["name"] . '">' . $item["name"] . '</option>';
@@ -433,19 +434,10 @@ if ($productWithCategory->execute()) {
         // let selectedTable = null;
 
         // Add by clicking product
-        document.querySelectorAll('.product').forEach(prod => {
-            prod.addEventListener('click', () => {
-                addToCart(prod.dataset.name, parseFloat(prod.dataset.price));
-            });
-        });
+
 
         // Add by barcode (simulate adding first product)
-        document.getElementById('barcode').addEventListener('keydown', e => {
-            if (e.key === 'Enter') {
-                addToCart('🍎 Apple', 2);
-                e.target.value = '';
-            }
-        });
+
 
         function addToCart(name, price) {
             if (cart[name]) cart[name].qty += 1;
@@ -612,19 +604,75 @@ if ($productWithCategory->execute()) {
         }
         let productsWithCategory = <?php echo json_encode($productsCategory); ?>;
 
-        document.getElementById("category").addEventListener("change", () => {
-            document.getElementById("product-list").innerHTML = "";
-            let categoryValue = document.getElementById("category").value;
-            let printProductCategoryInTheCart = productsWithCategory.filter(product => product.category == categoryValue);
-            // console.log(productsWithCategory.filter(product => product.category == categoryValue))
-            printProductCategoryInTheCart.forEach(item => {
+
+
+        if (document.getElementById("category").value == "all") {
+            productsWithCategory.forEach(item => {
                 document.getElementById("product-list").innerHTML +=
-                `
+                    `
                 <div class="product" data-name="${item['name']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
                 `;
             });
+        }
+
+
+        // add item by barcode using the laser code
+        document.getElementById('barcode').addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                let i = 0;
+                productsWithCategory.forEach(item => {
+                    if (item['name'] == e.target.value) {
+                        addToCart(item['name'], item['price']);
+                        i++;
+                    }
+                });
+                if (i == 0) {
+                    alert("لم يتم العثور على المنتج");
+                }
+                i = 0;
+                e.target.value = '';
+            }
+        });
+
+        document.getElementById("category").addEventListener("change", () => {
+            document.getElementById("product-list").innerHTML = "";
+            let categoryValue = document.getElementById("category").value;
+            if (categoryValue == "all") {
+                productsWithCategory.forEach(item => {
+                    document.getElementById("product-list").innerHTML +=
+                        `
+                <div class="product" data-name="${item['name']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
+                `;
+                });
+                document.querySelectorAll('.product').forEach(prod => {
+                    prod.addEventListener('click', () => {
+                        addToCart(prod.dataset.name, parseFloat(prod.dataset.price));
+                    });
+                });
+                return true;
+            }
+            let printProductCategoryInTheCart = productsWithCategory.filter(product => product.category == categoryValue);
+            printProductCategoryInTheCart.forEach(item => {
+                document.getElementById("product-list").innerHTML +=
+                    `
+                <div class="product" data-name="${item['name']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
+                `;
+            });
+
+            document.querySelectorAll('.product').forEach(prod => {
+                prod.addEventListener('click', () => {
+                    addToCart(prod.dataset.name, parseFloat(prod.dataset.price));
+                });
+            });
+        });
+
+        document.querySelectorAll('.product').forEach(prod => {
+            prod.addEventListener('click', () => {
+                addToCart(prod.dataset.name, parseFloat(prod.dataset.price));
+            });
         });
     </script>
+    <script src="../common/bootstrap.js"></script>
 </body>
 
 </html>

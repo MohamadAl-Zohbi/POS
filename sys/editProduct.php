@@ -57,6 +57,7 @@ if (isset($_GET['editProduct'])) {
     $price = $_GET['price'];
     $stock_quantity = $_GET['stockQuantity'];
     $category = $_GET['categoryId'];
+    $currency = $_GET['currency'];
     $id  = $_GET['productId'];
 
     if (!validateInput($cost_price, 'float')) {
@@ -67,7 +68,7 @@ if (isset($_GET['editProduct'])) {
         header("Location: ./products.php?error=input error stock quantity should be a number");
     }
 
-    $sql = "UPDATE products SET name = :name, barcode = :barcode, price = :price, cost_price = :costprice, stock_quantity = :stock_quantity, category = :category WHERE id = :id";
+    $sql = "UPDATE products SET name = :name, barcode = :barcode, price = :price, cost_price = :costprice, stock_quantity = :stock_quantity, category = :category, currency = :currency WHERE id = :id";
     $editProduct = $db->prepare($sql);
     $editProduct->bindParam(':name', $name);
     $editProduct->bindParam(':barcode', $barcode);
@@ -75,6 +76,7 @@ if (isset($_GET['editProduct'])) {
     $editProduct->bindParam(':costprice', $cost_price);
     $editProduct->bindParam(':stock_quantity', $stock_quantity);
     $editProduct->bindParam(':category', $category);
+    $editProduct->bindParam(':currency', $currency);
     $editProduct->bindParam(':id', $id);
     if ($editProduct->execute()) {
         header('Location: ./products.php');

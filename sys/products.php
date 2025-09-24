@@ -18,9 +18,10 @@ if (isset($_POST['add_product'])) {
     $costprice = $_POST['cost_price'];
     $stock_quantity  = $_POST['stock_quantity'];
     $category  = $_POST['category'];
+    $currency  = $_POST['currency'];
 
-    $sql = "INSERT INTO products (name, barcode, price, cost_price, stock_quantity, category) 
-            VALUES (:name,:barcode,:price,:costprice,:stock_quantity,:category)";
+    $sql = "INSERT INTO products (name, barcode, price, cost_price, stock_quantity, category,currency) 
+            VALUES (:name,:barcode,:price,:costprice,:stock_quantity,:category,:currency)";
 
     $addProduct = $db->prepare($sql);
     $addProduct->bindParam(':name', $name);
@@ -29,6 +30,7 @@ if (isset($_POST['add_product'])) {
     $addProduct->bindParam(':costprice', $costprice);
     $addProduct->bindParam(':stock_quantity', $stock_quantity);
     $addProduct->bindParam(':category', $category);
+    $addProduct->bindParam(':currency', $currency);
     if ($addProduct->execute()) {
         header('Location: products.php');
     }
@@ -115,7 +117,8 @@ if ($categories->execute()) {
             position: fixed;
             margin: auto;
         }
-         body {
+
+        body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f8f9fa;
@@ -184,7 +187,7 @@ if ($categories->execute()) {
 </head>
 
 <body>
-<?php include_once "./navbar.php"?>
+    <?php include_once "./navbar.php" ?>
     <!-- <div class="modal-overlay" id="dialog">
         <div class="modal">
             <h2>
@@ -237,6 +240,12 @@ if ($categories->execute()) {
                     document.getElementById("addCostPriceLabel").innerText = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 });
             </script>
+            <div class="col-md-1">
+                <select name="currency" class="form-select">
+                    <option value="usd">USD</option>
+                    <option value="lbp">LBP</option>
+                </select>
+            </div>
 
             <div class="col-md-1"><input type="number" name="stock_quantity" placeholder="الكمية" class="form-control" required></div>
             <div class="col-md-2">
@@ -263,6 +272,7 @@ if ($categories->execute()) {
                     <th>Barcode/باركود</th>
                     <th>Price/السعر</th>
                     <th>Cost Price/التكلفة</th>
+                    <th>Currency/العملة</th>
                     <th>Stock Qtc/المخزن</th>
                     <th>Category/الفئة</th>
                     <th>Action</th>
@@ -282,10 +292,11 @@ if ($categories->execute()) {
                     echo '<td>' . $item["barcode"] . '</td>';
                     echo '<td>' .  number_format($item["price"], 2, ".", ",") . '</td>';
                     echo '<td>' . number_format($item["cost_price"], 2, ".", ",") . '</td>';
+                    echo '<td>' . $item["currency"] . '</td>';
                     echo '<td>' . $item["stock_quantity"] . '</td>';
                     echo '<td>' . $item["category"] . '</td>';
                     echo '<td><a href="?delete=' . $item['id'] . '" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure?\')">Delete</a> &nbsp;';
-                    echo '<a data-category=' . $item["category"] . ' data-id=' . $item['id'] . ' data-stock_quantity="' . $item["stock_quantity"] . '" data-name="' . $item["name"] . '" data-barcode="' . $item["barcode"] . '" data-price="' . $item["price"] . '" data-cost_price="' . $item["cost_price"] . '" class="btn btn-secondary btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editProductModal" onclick="showDataBeforeEdit(this)">Edit</a></td>';
+                    echo '<a data-category=' . $item["category"] . ' data-id=' . $item['id'] . ' data-stock_quantity="' . $item["stock_quantity"] . '" data-name="' . $item["name"] . '" data-currency="' . $item["currency"] . '" data-barcode="' . $item["barcode"] . '" data-price="' . $item["price"] . '" data-cost_price="' . $item["cost_price"] . '" class="btn btn-secondary btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editProductModal" onclick="showDataBeforeEdit(this)">Edit</a></td>';
                     echo "</tr>";
                 }
                 ?>
@@ -301,7 +312,7 @@ if ($categories->execute()) {
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button  type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
                         <h5 class="modal-title" id="editProductModalLabel">تعديل المنتج</h5>
                     </div>
@@ -347,6 +358,13 @@ if ($categories->execute()) {
                                     });
                                 </script>
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="currency" class="form-label">العملة</label>
+                                <select class="form-select" id="currency" name="currency">
+                                    <option value="usd">USD</option>
+                                    <option value="lbp">LBP</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="stockQtc" class="form-label">الكمية</label>
@@ -384,6 +402,7 @@ if ($categories->execute()) {
         let costPrice = document.getElementById("costPrice");
         let stockQtc = document.getElementById("stockQtc");
         let category = document.getElementById("category");
+        let currency = document.getElementById("currency");
 
         productId.value = e.dataset.id
         productName.value = e.dataset.name
@@ -392,6 +411,7 @@ if ($categories->execute()) {
         costPrice.value = e.dataset.cost_price
         stockQtc.value = e.dataset.stock_quantity
         category.value = e.dataset.category
+        currency.value = e.dataset.currency
     }
 
 
