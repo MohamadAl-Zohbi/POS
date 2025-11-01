@@ -6,6 +6,7 @@ include_once './check.php';
 
 
 
+
 $categories = $db->prepare("SELECT * FROM categories");
 $categoriesList = [];
 if ($categories->execute()) {
@@ -22,7 +23,18 @@ if ($productWithCategory->execute()) {
         array_push($productsCategory, $row);
     }
 }
+
+
+$getDollar = $db->prepare("SELECT dollar FROM data");
+$dollar;
+if ($getDollar->execute()) {
+    $getDollar = $getDollar->fetchAll(PDO::FETCH_ASSOC);
+    if (count($getDollar)) {
+        $dollar = $getDollar[0]['dollar'];
+    }
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -358,21 +370,44 @@ if ($productWithCategory->execute()) {
         .unactive {
             opacity: 0.5;
         }
+        .hidden{
+            display: none;
+        }
+        #salesPopup{
+            position: absolute;
+            width: 90%;
+            right: 5%;
+            box-shadow: 1px 1px 100px 100px black;
+            z-index: 1000;
+        }
     </style>
 </head>
 
 <body>
-    <div class="modal-overlay" id="dialog">
-        <div class="modal">
-            <h2>Are you sure?</h2>
-            <!-- <p>This action cannot be undone.</p> -->
-            <div class="modal-buttons">
-                <button class="btn-yes" onclick="handleYes()">Yes</button>
-                &nbsp;
-                <button class="btn-no" onclick="closeDialog()">No</button>
+
+    <div id="salesPopup" class="hidden">
+        <!-- Popup box -->
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-4">
+            <div class="flex justify-between items-center border-b pb-2 mb-3">
+                <h2 class="text-lg font-semibold">🧾 Previous Sales</h2>
+                <button onclick="closeSalesPopup()" class="text-gray-500 hover:text-red-500 text-xl">&times;</button>
+            </div>
+
+            <!-- Scrollable content -->
+            <div class="max-h-96 overflow-y-auto divide-y divide-gray-200" id="salesList">
+                <!-- Sales will be added here dynamically -->
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-3 text-right">
+                <button onclick="closeSalesPopup()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded-md">
+                    Close
+                </button>
             </div>
         </div>
     </div>
+
+
     <main>
         <section class="products">
             <h2>Products</h2>
@@ -388,10 +423,7 @@ if ($productWithCategory->execute()) {
 
 
             <div class="product-list" id="product-list">
-                <!-- <div class="product" data-name="🍎 die32jfio23 foip45jpoti gj4poji op2ig jj" data-price="2">🍎 Appdhwqehfui32ji o4fj4iojfp5o34j gfpo4if4jpfo4ole<br>$2</div>
-                <div class="product" data-name="🥛 Milk" data-price="1.5">🥛 Milk<br>$1.5</div>
-                <div class="product" data-name="🍞 Bread" data-price="1.2">🍞 Bread<br>$1.2</div>
-                <div class="product" data-name="🥤 Soda" data-price="1">🥤 Soda<br>$1</div> -->
+
             </div>
 
 
@@ -404,7 +436,7 @@ if ($productWithCategory->execute()) {
                     <div class="table">4</div>
                 </div>
                 <button onclick="save()">Save</button>
-                <button onclick="openDialog()" style="background-color:red;">Clear All Tables</button>
+                <button onclick="if(confirm('Are you sure?')){handleYes() }" style="background-color:red;">Clear All Tables</button>
 
             </div>
         </section>
@@ -421,7 +453,12 @@ if ($productWithCategory->execute()) {
             <input type="text" id="search-invoice" placeholder="Search invoice by ID">
             <button onclick="print()">Print</button>
             <button class="unactive" onclick="print()">Save & Print</button>
-            <button onclick="print()">Pay</button>
+            <button onclick="addItems()">Pay</button>
+            <button
+                onclick="openSalesPopup()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                🧾 View Previous Sales
+            </button>
             <button class="unactive" onclick="print()">unpaid</button>
             <button onclick="cancelInvoice()">Cancel</button>
         </section>
@@ -431,6 +468,10 @@ if ($productWithCategory->execute()) {
 
     <script>
         let cart = {};
+        let total;
+        const usd = <?php echo $dollar; ?>
+
+
         // let selectedTable = null;
 
         // Add by clicking product
@@ -439,12 +480,13 @@ if ($productWithCategory->execute()) {
         // Add by barcode (simulate adding first product)
 
 
-        function addToCart(name, price, currency) {
+        function addToCart(name, price, currency, id) {
             if (cart[name]) cart[name].qty += 1;
             else cart[name] = {
                 price,
                 qty: 1,
-                currency
+                currency,
+                id
             };
             updateCart();
         }
@@ -470,11 +512,20 @@ if ($productWithCategory->execute()) {
             <td class="product-cell action bold"></td>
                    
         </tr>`;
-            let total = 0;
+
+            // the main price of the dollar
+            // let usd = 89000;
+            total = 0;
             for (let name in cart) {
                 let item = cart[name];
                 let itemTotal = item.qty * item.price;
-                total += itemTotal;
+
+                if (item.currency == "lbp") {
+                    total += itemTotal;
+                } else if (item.currency == "usd") {
+                    total += (itemTotal * usd);
+                }
+
                 let currency = item.currency;
                 let div = document.createElement('tr');
                 div.className = 'product-row';
@@ -482,7 +533,7 @@ if ($productWithCategory->execute()) {
                     `
         
             <td class="product-cell">
-                <button onclick="addToCart('${name}',${item.price})" class="qtn-button">+</button>
+                <button onclick="addToCart('${name}',${item.price},'${item.currency}',${item.id})" class="qtn-button">+</button>
                 <button onclick="removeFromCart('${name}',${item.price})" class="qtn-button">-</button>
             </td>    
             <td class="product-cell action">${truncate(name,10)} x  </td>
@@ -499,9 +550,8 @@ if ($productWithCategory->execute()) {
                 itemsDiv.appendChild(div);
             }
 
-            // we are here we should make the total with the usd and LBP
             if (total === 0) itemsDiv.innerHTML = '<p style="color:#777; text-align:center;">Cart is empty</p>';
-            document.getElementById('total').textContent = 'Total: $' + total.toFixed(2);
+            document.getElementById('total').innerHTML = 'L.L ' + formatNumber(total.toFixed(2)) + '<br>$$ ' + formatNumber((total / usd).toFixed(2));
         }
 
         function removeItem(name) {
@@ -537,10 +587,7 @@ if ($productWithCategory->execute()) {
         }
 
         function print() {
-            let myWindow = window.open("../common/print.php", "_blank", "width=600,height=400,left=200,top=100");
-            //    myWindow.document.write(``);
-
-
+            let myWindow = window.open("../common/print.php?data=" + JSON.stringify(cart) + "&dollar=" + usd + "&total=" + total, "_blank", "width=416,height=400,left=200,top=100");
         }
 
         function editPrice(name, price) {
@@ -575,22 +622,19 @@ if ($productWithCategory->execute()) {
         }
 
 
-        function openDialog() {
-            document.getElementById("dialog").style.display = "flex";
-        }
+        // function openDialog() {
+        //     document.getElementById("dialog").style.display = "flex";
+        // }
 
-        function closeDialog() {
-            document.getElementById("dialog").style.display = "none";
-        }
+        // function closeDialog() {
+        //     document.getElementById("dialog").style.display = "none";
+        // }
 
         function handleYes() {
-            closeDialog();
-            console.log("You clicked Yes!");
             localStorage.clear();
-            // cart = {};
             updateCart();
             alert("تم تفريغ الطاولات");
-            location.reload()
+            location.reload();
         }
 
         function cancelInvoice() {
@@ -614,7 +658,7 @@ if ($productWithCategory->execute()) {
             productsWithCategory.forEach(item => {
                 document.getElementById("product-list").innerHTML +=
                     `
-                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
+                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-id="${item['id']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
                 `;
             });
         }
@@ -626,7 +670,7 @@ if ($productWithCategory->execute()) {
                 let i = 0;
                 productsWithCategory.forEach(item => {
                     if (item['name'] == e.target.value) {
-                        addToCart(item['name'], item['price'], item['currency']);
+                        addToCart(item['name'], item['price'], item['currency'], item['id']);
                         i++;
                     }
                 });
@@ -645,12 +689,13 @@ if ($productWithCategory->execute()) {
                 productsWithCategory.forEach(item => {
                     document.getElementById("product-list").innerHTML +=
                         `
-                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
+                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-id="${item['id']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
                 `;
                 });
                 document.querySelectorAll('.product').forEach(prod => {
                     prod.addEventListener('click', () => {
-                        addToCart(prod.dataset.name, parseFloat(prod.dataset.price), prod.dataset.currency);
+                        addToCart(prod.dataset.name, parseFloat(prod.dataset.price), prod.dataset.currency, prod.dataset.id);
+                        document.getElementById("barcode").focus();
                     });
                 });
                 return true;
@@ -659,20 +704,22 @@ if ($productWithCategory->execute()) {
             printProductCategoryInTheCart.forEach(item => {
                 document.getElementById("product-list").innerHTML +=
                     `
-                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
+                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-id="${item['id']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
                 `;
             });
 
             document.querySelectorAll('.product').forEach(prod => {
                 prod.addEventListener('click', () => {
-                    addToCart(prod.dataset.name, parseFloat(prod.dataset.price), prod.dataset.currency);
+                    addToCart(prod.dataset.name, parseFloat(prod.dataset.price), prod.dataset.currency, prod.dataset.id);
+                    document.getElementById("barcode").focus();
                 });
             });
         });
 
         document.querySelectorAll('.product').forEach(prod => {
             prod.addEventListener('click', () => {
-                addToCart(prod.dataset.name, parseFloat(prod.dataset.price), prod.dataset.currency);
+                addToCart(prod.dataset.name, parseFloat(prod.dataset.price), prod.dataset.currency, prod.dataset.id);
+                document.getElementById("barcode").focus();
             });
         });
 
@@ -687,7 +734,82 @@ if ($productWithCategory->execute()) {
             return parts.join(".");
         }
     </script>
+    <!-- pop up window -->
+    <script>
+        const sales = [{
+                id: 1025,
+                date: "2025-10-24 19:45",
+                total: 194250,
+                items: 5,
+                cashier: "Mohamad"
+            },
+            {
+                id: 1024,
+                date: "2025-10-24 18:30",
+                total: 82000,
+                items: 3,
+                cashier: "Ali"
+            },
+            {
+                id: 1023,
+                date: "2025-10-24 16:15",
+                total: 320000,
+                items: 10,
+                cashier: "Rami"
+            },
+            {
+                id: 1022,
+                date: "2025-10-24 15:00",
+                total: 102000,
+                items: 4,
+                cashier: "Sara"
+            },
+            {
+                id: 1021,
+                date: "2025-10-24 14:10",
+                total: 220000,
+                items: 7,
+                cashier: "Youssef"
+            },
+        ];
+
+        const listContainer = document.getElementById("salesList");
+
+        function openSalesPopup() {
+            document.getElementById("salesPopup").classList.remove("hidden");
+            renderSales();
+        }
+
+        function closeSalesPopup() {
+            document.getElementById("salesPopup").classList.add("hidden");
+        }
+
+        function renderSales() {
+            listContainer.innerHTML = ""; // clear previous list
+            sales.forEach(sale => {
+                const div = document.createElement("div");
+                div.className = "py-3 cursor-pointer hover:bg-gray-50 transition";
+                div.innerHTML = `
+        <div class="flex justify-between">
+          <div>
+            <p class="font-medium">Invoice #${sale.id}</p>
+            <p class="text-xs text-gray-500">${sale.date}</p>
+          </div>
+          <p class="font-bold text-green-600">₤${sale.total.toLocaleString()}</p>
+        </div>
+        <div class="mt-1 text-xs text-gray-500">
+          <p>Items: ${sale.items} | Cashier: ${sale.cashier}</p>
+        </div>
+      `;
+                div.onclick = () => alert("Load Invoice #" + sale.id);
+                listContainer.appendChild(div);
+            });
+        }
+    </script>
+
+
     <script src="../common/bootstrap.js"></script>
+    <script src="../api/posApi.js"></script>
 </body>
 
 </html>
