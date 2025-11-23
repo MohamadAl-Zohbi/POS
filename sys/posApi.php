@@ -23,6 +23,7 @@ if (!$data || !isset($data['items']) || !isset($data['total'])) {
 $userID;
 $dollar;
 $saleID;
+$customerId;
 
 session_start();
 $selectUser = $db->prepare("SELECT * FROM users WHERE username = :username");
@@ -48,8 +49,18 @@ if ($getDollar->execute()) {
     }
 }
 
-$date      = date("Y-m-d H:i:s");
-$totalUSD   = number_format(($data['total'] / $dollar), 2);
+
+$getDate = $db->prepare("SELECT date FROM data");
+$dataDate;
+if ($getDate->execute()) {
+    $getDate = $getDate->fetchAll(PDO::FETCH_ASSOC);
+    if (count($getDate)) {
+        $dataDate = $getDate[0]['date'];
+    }
+}
+
+$date      = $dataDate . " " . date("H:i:s");
+$totalUSD   = number_format(($data['total'] / $dollar), 2, ".", "");
 $totalLBP     = $data['total'];
 
 
@@ -63,6 +74,20 @@ $addSale->bindParam(':total_amount_usd', $totalUSD);
 $addSale->bindParam(':total_amount_lbp', $totalLBP);
 
 if ($addSale->execute()) {
+    // update the cusmtomer amount
+    if (isset($data['customerId'])) {
+
+        if ($data['customerId'] != "") {
+            $customerId =  $data['customerId'];
+            $customerQuery = "UPDATE customers SET balance =  balance + :balance WHERE id=:id;";
+
+            $updateCustomerAmount = $db->prepare($customerQuery);
+
+            $updateCustomerAmount->bindParam(':balance', $totalLBP);
+            $updateCustomerAmount->bindParam(':id', $customerId);
+            $updateCustomerAmount->execute();
+        }
+    }
 }
 
 $getSale = $db->prepare("SELECT MAX(id) as id FROM sales");
@@ -73,29 +98,31 @@ if ($getSale->execute()) {
     }
 }
 
-$sql = "";
+$sql = "INSERT INTO sale_items(sale_id,product_id,quantity,unit_price,currency,date) VALUES";
 
 // prepare the main query
 
-
+$index = 0;
 foreach ($data['items'] as $i => $item) {
+    $index++;
     $productID = $item["id"];
     $quantity = $item["qty"];
     $price = $item["price"];
     $currency = $item["currency"];
     // $sql .= "cx";
     // saleid
-    $sql .= "INSERT INTO sale_items(sale_id,product_id,quantity,unit_price,currency,date) VALUES (".$saleID.",".$productID.",".$quantity.','.$price.',"'.$currency.'","'.$date.'");';
+    if ($index == 1) {
+        $sql .= "(" . $saleID . "," . $productID . "," . $quantity . ',' . $price . ',"' . $currency . '","' . $date . '")';
+    } else {
+        $sql .= ",(" . $saleID . "," . $productID . "," . $quantity . ',' . $price . ',"' . $currency . '","' . $date . '")';
+    }
 }
-
 
 $addSalesLines = $db->prepare($sql);
 if (!$addSalesLines->execute()) {
-    echo json_encode(['we have a problem']);
+    echo json_encode(['we have a problem in add lines']);
 }
-
-// Example response
-
 // Send response
-echo json_encode(['details'=>"done"]);
-
+//done
+echo json_encode(['details' => "done"]);
+// exit;

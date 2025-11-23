@@ -3,9 +3,11 @@ const apiUrl = "http://localhost/POS/sys/posApi.php";
 
 // Data you want to send
 function addItems() {
+    // console.log(cart)
     const payload = {
         "items": cart,
-        "total": total
+        "total": total,
+        "customerId": customerId
     };
     fetch(apiUrl, {
             method: "POST",
@@ -23,13 +25,16 @@ function addItems() {
             return response.json();
         })
         .then((data) => {
-            console.log(data.details);
-            if (data.details == "done") {
-                cart = [];
-                updateCart();
-                alert('success');
-                document.getElementById("barcode").focus();
 
+            // location.reload();
+            console.log(data);
+            if (data.details == "done") {
+                cart = {};
+                customerId = "";
+                document.getElementById("result").innerText = "";
+
+                updateCart();
+                document.getElementById("barcode").focus();
                 let index = 0;
                 document.querySelectorAll('.table').forEach((tb) => {
                     index++;

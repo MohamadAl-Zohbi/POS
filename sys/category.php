@@ -130,7 +130,7 @@ if ($categories->execute()) {
                     </div>
 
                     <div class="mb-3" style="text-align: center;">
-                        <label for="productName" class="form-label">اسم المنتج</label>
+                        <label for="productName" class="form-label">اسم الفئة</label>
                         <input style="max-width: 500px; margin:auto;text-align:center;" type="text" class="form-control" id="productName" name="productName" placeholder="الاسم">
                     </div>
 

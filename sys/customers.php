@@ -35,17 +35,21 @@
             if ($validate->execute()) {
                 $validate = $validate->fetchAll(PDO::FETCH_ASSOC);
                 if (count($validate) == 1) {
-                    $balance = (float)$validate[0]['balance'] + (float)$amount;
-                    $pay = $db->prepare("UPDATE customers SET balance = :balance WHERE id = :id");
-                    $pay->bindParam(':id', $id);
-                    $pay->bindParam(':balance', $balance);
-                    if ($pay->execute()) header('Location: customers.php');
+                    if ((float)$validate[0]['balance'] >= (float)$amount) {
+                        $balance = (float)$validate[0]['balance'] - (float)$amount;
+                        $pay = $db->prepare("UPDATE customers SET balance = :balance WHERE id = :id");
+                        $pay->bindParam(':id', $id);
+                        $pay->bindParam(':balance', $balance);
+                        if ($pay->execute()) header('Location: customers.php');
+                    } else {
+                        echo '<script>alert("يجب ان لا يكون المبلغ اكبر من الحساب")</script>';
+                    }
                 } else {
                     echo '<script>alert("هذا الزبون غير متوفر")</script>';
                 }
             }
-        }else{
-             echo '<script>alert("الرجاء ادخال رقم")</script>';
+        } else {
+            echo '<script>alert("الرجاء ادخال رقم")</script>';
         }
     }
 
@@ -111,7 +115,7 @@
          <!-- Add Customer Form -->
          <form method="POST" class="mb-4 row g-2">
              <div class="col-md-2"><input type="text" name="name" placeholder="الاسم" class="form-control" required></div>
-             <div class="col-md-2"><input type="text" name="address" placeholder="باركود" class="form-control" required></div>
+             <div class="col-md-2"><input type="text" name="address" placeholder="الموقع" class="form-control" required></div>
              <!-- <div class="col-md-2"><input type="text" name="barcode" placeholder="باركود" class="form-control" required></div> -->
 
              <div class="col-md-2"><button type="submit" name="add_customer" class="btn btn-primary w-100">اضافة عميل</button></div>
@@ -137,7 +141,7 @@
                         echo '<td>' . $item["name"] . '</td>';
                         echo '<td>' . $item["address"] . '</td>';
                         // echo '<td>' .  number_format($item["price"], 2, ".", ",") . '</td>';
-                        echo '<td>' . number_format($item["balance"], 2, ".", ",") . '</td>';
+                        echo '<td>' . number_format($item["balance"], 2, ".", ",") . 'L.L</td>';
                         // echo '<td>' . $item["balance"] . '</td>';
 
                         echo '<td><a data-id="' . $item['id'] . '" class="btn btn-primary btn-sm" onclick="pay(this)">Pay</a> &nbsp;';
@@ -226,6 +230,9 @@
              amount = prompt("ادخل المبلغ");
          }
 
+         if (amount === null) {
+             return false;
+         }
 
          let url = "customers.php?id=" + encodeURIComponent(id) + "&amount=" + amount;
 

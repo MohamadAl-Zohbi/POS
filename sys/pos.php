@@ -2,11 +2,6 @@
 include_once '../common/connect.php';
 include_once './check.php';
 
-
-
-
-
-
 $categories = $db->prepare("SELECT * FROM categories");
 $categoriesList = [];
 if ($categories->execute()) {
@@ -21,6 +16,16 @@ $productsCategory = [];
 if ($productWithCategory->execute()) {
     while ($row = $productWithCategory->fetch(\PDO::FETCH_ASSOC)) {
         array_push($productsCategory, $row);
+    }
+}
+
+// get customers
+$getCustomers = $db->prepare("SELECT * FROM customers");
+//  WHERE category != ''
+$customers = [];
+if ($getCustomers->execute()) {
+    while ($row = $getCustomers->fetch(\PDO::FETCH_ASSOC)) {
+        array_push($customers, $row);
     }
 }
 
@@ -296,7 +301,6 @@ if ($getDollar->execute()) {
         button:hover {
             background-color: blue !important;
             box-shadow: 1px 1px 0px 1px #007bff !important;
-
         }
 
         .modal-overlay {
@@ -370,43 +374,153 @@ if ($getDollar->execute()) {
         .unactive {
             opacity: 0.5;
         }
-        .hidden{
+
+        .hidden {
             display: none;
         }
-        #salesPopup{
+
+        #salesPopup {
             position: absolute;
             width: 90%;
             right: 5%;
             box-shadow: 1px 1px 100px 100px black;
             z-index: 1000;
         }
+
+        /*  modal */
+        /* Button style */
+        .btn {
+            padding: 12px 20px;
+            background: #4b7bec;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background: #3867d6;
+        }
+
+        /* Popup background */
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        /* Popup box */
+        .popup-content {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.4s ease forwards;
+            text-align: center;
+            color: white;
+        }
+
+        /* Options */
+        .options {
+            margin: 15px 0;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-3px);
+        }
+
+        /* Close button */
+        .close-btn {
+            margin-top: 10px;
+            padding: 10px 16px;
+            background: #ff3f34;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #d63031;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
+<script>
+    let cart = {};
+    let customerId="";
+</script>
 
 <body>
+    <!-- Button trigger modal -->
+    <!-- <button id="openPopup" class="btn">Select Option</button> -->
 
-    <div id="salesPopup" class="hidden">
-        <!-- Popup box -->
-        <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-4">
-            <div class="flex justify-between items-center border-b pb-2 mb-3">
-                <h2 class="text-lg font-semibold">🧾 Previous Sales</h2>
-                <button onclick="closeSalesPopup()" class="text-gray-500 hover:text-red-500 text-xl">&times;</button>
+    <!-- Modal -->
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <h2>Select a Customer</h2>
+
+            <div class="options">
+                <?php
+                foreach ($customers as $i => $item) {
+                    echo '<div class="option" onclick="selectOption(' . $item['id'] . ',`'.$item['name'].'`)">' . $item['name'] . '</div>';
+                }
+                ?>
+                <!-- <div class="option" onclick="selectOption('Option 1')">Option 1</div>
+                <div class="option" onclick="selectOption('Option 2')">Option 2</div>
+                <div class="option" onclick="selectOption('Option 3')">Option 3</div> -->
             </div>
 
-            <!-- Scrollable content -->
-            <div class="max-h-96 overflow-y-auto divide-y divide-gray-200" id="salesList">
-                <!-- Sales will be added here dynamically -->
-            </div>
-
-            <!-- Footer -->
-            <div class="mt-3 text-right">
-                <button onclick="closeSalesPopup()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded-md">
-                    Close
-                </button>
-            </div>
+            <button id="closePopup" class="close-btn">Close</button>
         </div>
     </div>
 
+    <!-- <p id="result"></p> -->
 
     <main>
         <section class="products">
@@ -450,16 +564,20 @@ if ($getDollar->execute()) {
                 <label><input type="checkbox" id="paid"> Paid</label>
                 <span id="total">Total: 0</span>
             </div>
-            <input type="text" id="search-invoice" placeholder="Search invoice by ID">
+
+            <p id="result"></p>
+
+            <!-- <input type="text" id="search-invoice" placeholder="Search invoice by ID"> -->
             <button onclick="print()">Print</button>
-            <button class="unactive" onclick="print()">Save & Print</button>
             <button onclick="addItems()">Pay</button>
+            <button onclick="print(),addItems()">Pay & Print</button>
             <button
                 onclick="openSalesPopup()"
                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
                 🧾 View Previous Sales
             </button>
-            <button class="unactive" onclick="print()">unpaid</button>
+            <button id="openPopup" class=" btn-danger">unpaid</button>
+            <!-- <button class=" btn-danger" onclick="print()">unpaid</button> -->
             <button onclick="cancelInvoice()">Cancel</button>
         </section>
     </main>
@@ -467,7 +585,6 @@ if ($getDollar->execute()) {
     <footer>&copy; 2025 My POS System</footer>
 
     <script>
-        let cart = {};
         let total;
         const usd = <?php echo $dollar; ?>
 
@@ -638,7 +755,9 @@ if ($getDollar->execute()) {
         }
 
         function cancelInvoice() {
-            cart = {}
+            cart = {};
+            customerId="";
+            document.getElementById("result").innerText="";
             updateCart()
         }
         onload = () => {
@@ -723,6 +842,10 @@ if ($getDollar->execute()) {
             });
         });
 
+        function openSalesPopup() {
+            window.open('../common/previousSales.php', "_blank", "width=416,height=400,left=200,top=100");
+        }
+
         function formatNumber(number) {
             // convert to string and keep only digits, commas, and dots
             let value = String(number).replace(/[^\d.,]/g, "");
@@ -735,81 +858,28 @@ if ($getDollar->execute()) {
         }
     </script>
     <!-- pop up window -->
-    <script>
-        const sales = [{
-                id: 1025,
-                date: "2025-10-24 19:45",
-                total: 194250,
-                items: 5,
-                cashier: "Mohamad"
-            },
-            {
-                id: 1024,
-                date: "2025-10-24 18:30",
-                total: 82000,
-                items: 3,
-                cashier: "Ali"
-            },
-            {
-                id: 1023,
-                date: "2025-10-24 16:15",
-                total: 320000,
-                items: 10,
-                cashier: "Rami"
-            },
-            {
-                id: 1022,
-                date: "2025-10-24 15:00",
-                total: 102000,
-                items: 4,
-                cashier: "Sara"
-            },
-            {
-                id: 1021,
-                date: "2025-10-24 14:10",
-                total: 220000,
-                items: 7,
-                cashier: "Youssef"
-            },
-        ];
 
-        const listContainer = document.getElementById("salesList");
-
-        function openSalesPopup() {
-            document.getElementById("salesPopup").classList.remove("hidden");
-            renderSales();
-        }
-
-        function closeSalesPopup() {
-            document.getElementById("salesPopup").classList.add("hidden");
-        }
-
-        function renderSales() {
-            listContainer.innerHTML = ""; // clear previous list
-            sales.forEach(sale => {
-                const div = document.createElement("div");
-                div.className = "py-3 cursor-pointer hover:bg-gray-50 transition";
-                div.innerHTML = `
-        <div class="flex justify-between">
-          <div>
-            <p class="font-medium">Invoice #${sale.id}</p>
-            <p class="text-xs text-gray-500">${sale.date}</p>
-          </div>
-          <p class="font-bold text-green-600">₤${sale.total.toLocaleString()}</p>
-        </div>
-        <div class="mt-1 text-xs text-gray-500">
-          <p>Items: ${sale.items} | Cashier: ${sale.cashier}</p>
-        </div>
-      `;
-                div.onclick = () => alert("Load Invoice #" + sale.id);
-                listContainer.appendChild(div);
-            });
-        }
-    </script>
 
 
     <script src="../common/bootstrap.js"></script>
     <script src="../api/posApi.js"></script>
+
+    <!-- modal -->
+    <script>
+        let popup = document.getElementById("popup");
+        let openPopup = document.getElementById("openPopup");
+        let closePopup = document.getElementById("closePopup");
+        let result = document.getElementById("result");
+
+        openPopup.onclick = () => popup.style.display = "flex";
+        closePopup.onclick = () => popup.style.display = "none";
+
+        function selectOption(id,name) {
+            result.innerText = "You selected: " + name;
+            customerId = id;
+            popup.style.display = "none";
+        }
+    </script>
 </body>
 
 </html>
