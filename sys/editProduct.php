@@ -47,10 +47,6 @@ function validateInput($input, $type, $min = null, $max = null)
 }
 
 if (isset($_GET['editProduct'])) {
-    // post cannot be echoed but get yes you still here in this code in the next time continue from here 
-    // till now you do not have errors continue greatelly
-
-
     $name = $_GET['productName'];
     $barcode = $_GET['barcode'];
     $cost_price = $_GET['costPrice'];

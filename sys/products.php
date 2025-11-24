@@ -279,10 +279,6 @@ if ($categories->execute()) {
                 </tr>
             </thead>
             <tbody>
-
-
-
-
                 <?php
                 foreach ($data as $i => $item) {
                     echo "<tr>";
@@ -296,7 +292,7 @@ if ($categories->execute()) {
                     echo '<td>' . $item["stock_quantity"] . '</td>';
                     echo '<td>' . $item["category"] . '</td>';
                     echo '<td><a href="?delete=' . $item['id'] . '" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure?\')">Delete</a> &nbsp;';
-                    echo '<a data-category=' . $item["category"] . ' data-id=' . $item['id'] . ' data-stock_quantity="' . $item["stock_quantity"] . '" data-name="' . $item["name"] . '" data-currency="' . $item["currency"] . '" data-barcode="' . $item["barcode"] . '" data-price="' . $item["price"] . '" data-cost_price="' . $item["cost_price"] . '" class="btn btn-secondary btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editProductModal" onclick="showDataBeforeEdit(this)">Edit</a></td>';
+                    echo '<a data-category="' . $item["category"] . '" data-id=' . $item['id'] . ' data-stock_quantity="' . $item["stock_quantity"] . '" data-name="' . $item["name"] . '" data-currency="' . $item["currency"] . '" data-barcode="' . $item["barcode"] . '" data-price="' . $item["price"] . '" data-cost_price="' . $item["cost_price"] . '" class="btn btn-secondary btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editProductModal" onclick="showDataBeforeEdit(this)">Edit</a></td>';
                     echo "</tr>";
                 }
                 ?>
@@ -373,7 +369,6 @@ if ($categories->execute()) {
                         <div class="mb-3">
                             <label for="category" class="form-label">الفئة</label>
                             <select class="form-select" id="category" name="categoryId">
-                                <!-- <option value=""></option> -->
                                 <?php
                                 foreach ($categoriesSelect as $i => $item) {
                                     echo '<option value="' . $item["name"] . '">' . $item["name"] . '</option>';
@@ -427,6 +422,7 @@ if ($categories->execute()) {
 
     // Check if "error" exists
     onload = () => {
+        document.getElementById("category").value = "test";
         if (urlParams.has("error")) {
             alert(
                 "<?php
