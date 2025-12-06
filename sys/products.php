@@ -1,12 +1,3 @@
-<!-- <script>
-     function formatNumber(number) {
-            // remove any non-digit characters
-            let value = JSON.stringify(number).replace(/\D/g, "");
-
-            // format with thousands separator
-            return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-</script> -->
 <?php
 include_once '../common/connect.php';
 include_once './check.php';
@@ -36,9 +27,6 @@ if (isset($_POST['add_product'])) {
     }
 }
 
-
-
-
 // --- Delete Product ---
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
@@ -55,32 +43,6 @@ if (isset($_GET['delete'])) {
         }
     }
 }
-
-
-// --- Edit Product ---
-// if (isset($_POST['editProduct'])) {
-//     $name      = $_POST['name'];
-//     $barcode   = $_POST['barcode'];
-//     $price     = $_POST['price'];
-//     $costprice = $_POST['cost_price'];
-//     $stock_quantity  = $_POST['stock_quantity'];
-//     $category  = $_POST['category'];
-
-//     $sql = "UPDATE products SET name='Moudi', barcode='123', price='22', cost_price='12', stock_quantity='22', category=10 WHERE id = 1";
-
-//     $addProduct = $db->prepare($sql);
-//     $addProduct->bindParam(':name', $name);
-//     $addProduct->bindParam(':barcode', $barcode);
-//     $addProduct->bindParam(':price', $price);
-//     $addProduct->bindParam(':costprice', $costprice);
-//     $addProduct->bindParam(':stock_quantity', $stock_quantity);
-//     $addProduct->bindParam(':category', $category);
-//     if ($addProduct->execute()) {
-//         header('Location: products.php');
-//     }
-// }
-
-
 $result = $db->prepare("SELECT * FROM products");
 $categories = $db->prepare("SELECT * FROM categories");
 
@@ -99,10 +61,6 @@ if ($categories->execute()) {
     }
 }
 
-// if(isset($_GET['error'])){
-// echo $_GET['error'];
-// }
-
 ?>
 
 <!DOCTYPE html>
@@ -110,8 +68,10 @@ if ($categories->execute()) {
 
 <head>
     <meta charset="UTF-8">
-    <title>Products Control</title>
+    <title>الأصناف</title>
     <link href="../common/bootstrap.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../assets/pos-icon-2.jpg">
+
     <style>
         #card {
             position: fixed;

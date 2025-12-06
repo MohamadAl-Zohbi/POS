@@ -59,7 +59,9 @@ if ($categories->execute()) {
 
 <head>
     <meta charset="UTF-8">
-    <title>Products Control</title>
+    <title>الفئة</title>
+    <link rel="icon" type="image/png" href="../assets/pos-icon-2.jpg">
+
     <link href="../common/bootstrap.css" rel="stylesheet">
     <style>
         #card {

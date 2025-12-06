@@ -48,8 +48,10 @@ if (isset($_GET['search'])) {
 
 <head>
     <meta charset="UTF-8">
-    <title>Products Control</title>
+    <title>تقرير بالمبيعات</title>
     <link href="../common/bootstrap.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../assets/pos-icon-2.jpg">
+
     <style>
         #card {
             position: fixed;

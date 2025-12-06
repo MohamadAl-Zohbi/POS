@@ -188,9 +188,9 @@ if ($factureLines->execute()) {
 
             });
             
-                document.getElementById("subTotal").innerText = formatNumber(total_lbp) + " " + formatNumber(total_usd) ;
-                document.getElementById("tax").innerText = formatNumber(total_lbp * 0.11) + " " + formatNumber(total_usd * 0.11);
-                document.getElementById("total").innerText = formatNumber((total_lbp * 0.11) + total_lbp);
+                document.getElementById("subTotal").innerHTML = formatNumber(total_lbp) + " L.L<br> " + formatNumber(total_usd) + "$" ;
+                document.getElementById("tax").innerHTML = formatNumber(total_lbp * 0.11) + " L.L<br> " + formatNumber(total_usd * 0.11) + "$" ;
+                document.getElementById("total").innerHTML = formatNumber((total_lbp * 0.11) + total_lbp) + " L.L<br> " +formatNumber((total_usd * 0.11) + total_usd) + "$";
 
         }
 

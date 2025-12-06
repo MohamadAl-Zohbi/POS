@@ -2,6 +2,7 @@
 include_once '../common/connect.php';
 include_once './check.php';
 include_once './onlyAdmin.php';
+
 if (isset($_POST['add_category'])) {
     $name      = $_POST['name'];
     $sql = "INSERT INTO categories (name) VALUES (:name)";
@@ -20,7 +21,7 @@ if (isset($_GET['delete'])) {
     $deleteSale = $db->prepare("DELETE FROM sales WHERE id=:id");
     $deleteSale->bindParam(':id', $id);
 
-    $deleteSaleItems = $db->prepare("DELETE FROM sale_items WHERE id=:id");
+    $deleteSaleItems = $db->prepare("DELETE FROM sale_items WHERE sale_id=:id");
     $deleteSaleItems->bindParam(':id', $id);
 
     if ($deleteSaleItems->execute()) {
@@ -33,24 +34,6 @@ if (isset($_GET['delete'])) {
         echo '<script>alert("خطأ مجهول")</script>';
     }
 }
-
-// SELECT * FROM sale_items,products WHERE sale_items.sale_id = 85 AND  sale_items.product_id = products.id
-
-// --- Show Details ---
-// if (isset($_GET['details'])) {
-//     $id = $_GET['details'];
-
-//     $saleDetails = $db->prepare("SELECT * FROM sale_items,products WHERE sale_items.sale_id = :id AND  sale_items.product_id = products.id");
-//     $saleDetails->bindParam(':id', $id);
-
-//     $saleCardDetails = [];
-//     if ($saleDetails->execute()) {
-//         while ($rowe = $saleDetails->fetch(\PDO::FETCH_BOTH)) {
-//             array_push($saleCardDetails, $rowe);
-//         }
-//     }
-// }
-
 
 // Select Bills 
 $sales = $db->prepare("SELECT * FROM sales WHERE date >= '" . date('Y-m-d') . "' AND date <  '" . date('Y-m-d', strtotime('+1 day')) . "';");
@@ -77,7 +60,9 @@ if (isset($_GET['search'])) {
 
 <head>
     <meta charset="UTF-8">
-    <title>Products Control</title>
+    <title>الفواتير</title>
+    <link rel="icon" type="image/png" href="../assets/pos-icon-2.jpg">
+
     <link href="../common/bootstrap.css" rel="stylesheet">
     <style>
         #card {

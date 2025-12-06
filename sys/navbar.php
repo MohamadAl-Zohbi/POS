@@ -49,6 +49,8 @@ if (isset($_GET['updateDollar'])) {
                 echo "التقرير اليومي";
             } else if (str_contains($url['path'], "productReport")) {
                 echo "تقرير بالمبيعات";
+            }else if (str_contains($url['path'], "settings")) {
+                echo "الإعدادات";
             }
 
 
@@ -94,6 +96,7 @@ if (isset($_GET['updateDollar'])) {
                         </li>
                         <li><a class="dropdown-item" href="?closeDay=">اغلاق اليوم</a></li>
                         <li><a class="dropdown-item" onclick="updateDollar()" href="">تعديل الدولار</a></li>
+                        <li><a class="dropdown-item" href="./settings.php">الإعدادات</a></li>
                         <li><a class="dropdown-item" href="./pos.php">POS</a></li>
                     </ul>
                 </li>

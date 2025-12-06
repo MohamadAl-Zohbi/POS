@@ -54,8 +54,10 @@ if ($users->execute()) {
 
 <head>
     <meta charset="UTF-8">
-    <title>Products Control</title>
+    <title>المستخدمين</title>
     <link href="../common/bootstrap.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../assets/pos-icon-2.jpg">
+
     <style>
         #card {
             position: fixed;

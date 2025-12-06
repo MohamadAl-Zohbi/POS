@@ -51,7 +51,8 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Awesome Sidebar</title>
+            <link rel="icon" type="image/png" href="../assets/pos-icon-2.jpg">
+        <title>الصفحة الرئيسية</title>
         <style>
             .grid1 {
                 float: right;

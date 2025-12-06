@@ -46,8 +46,10 @@ if ($getDollar->execute()) {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Modern POS System</title>
+    <title>POS</title>
     <link href="../common/bootstrap.css" rel="stylesheet">
+        <link rel="icon" type="image/png" href="../assets/pos-icon-2.jpg">
+
 
     <style>
         :root {
