@@ -3,6 +3,14 @@
     include_once './check.php';
     include_once './onlyAdmin.php';
 
+    $getData = $db->prepare("SELECT * FROM data");
+    $data;
+    if ($getData->execute()) {
+        $getData = $getData->fetchAll(PDO::FETCH_ASSOC);
+        if (count($getData)) {
+            $data = $getData[0];
+        }
+    }
     ?>
 
 
@@ -38,25 +46,25 @@
 
                         <!-- Preview -->
                         <div class="mb-3">
-                            <img id="logoPreview" src="" alt="Logo preview" class="img-thumbnail d-none" style="max-width: 200px;">
+                            <img id="logoPreview" src="../uploads/<?php echo $data['logo']?>" alt="Logo preview" class="img-thumbnail" style="max-width: 200px;">
                         </div>
 
                         <!-- Company Name -->
                         <div class="mb-3">
                             <label class="form-label">إسم المؤسسة</label>
-                            <input type="text" class="form-control" id="company_name" name="company_name" placeholder="أدخل إسم المؤسسة">
+                            <input type="text" value="<?php echo $data['company_name']?>" class="form-control" id="company_name" name="company_name" placeholder="أدخل إسم المؤسسة">
                         </div>
 
                         <!-- Address -->
                         <div class="mb-3">
                             <label class="form-label">الموقع</label>
-                            <input type="text" class="form-control" id="address" name="address" placeholder="البلدة,الشارع...">
+                            <input type="text" class="form-control" id="address" value="<?php echo $data['address']?>" name="address" placeholder="البلدة,الشارع...">
                         </div>
 
                         <!-- Telephone -->
                         <div class="mb-3">
                             <label class="form-label">الهاتف</label>
-                            <input type="text" class="form-control" name="tel" id="tel" placeholder="+961 ...">
+                            <input type="text" class="form-control" value="<?php echo $data['tel']?>" name="tel" id="tel" placeholder="+961 ...">
                         </div>
 
                         <!-- Save Button -->
@@ -79,6 +87,7 @@
                 preview.classList.remove("d-none");
             }
         });
+        
     </script>
 
     </html>

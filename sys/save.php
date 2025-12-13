@@ -39,9 +39,8 @@
         $editData->bindParam(':company_name', $company_name);
 
         if ($editData->execute()) {
-            // header('Location: ./products.php');
+            header('Location: ./dashboard.php');
         }
-        echo "Saved!";
     }
     ?>
 </body>
