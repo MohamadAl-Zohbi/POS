@@ -28,8 +28,7 @@
 
     <body>
         <?php include_once 'navbar.php' ?>
-
-        <div class="container mt-5">
+        <div class="container mt-4">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0 text-center">تعديل بيانات المؤسسة</h5>
@@ -46,27 +45,40 @@
 
                         <!-- Preview -->
                         <div class="mb-3">
-                            <img id="logoPreview" src="../uploads/<?php echo $data['logo']?>" alt="Logo preview" class="img-thumbnail" style="max-width: 200px;">
+                            <img id="logoPreview" src="../uploads/<?php echo $data['logo'] ?>" alt="Logo preview" class="img-thumbnail" style="max-width: 200px;">
                         </div>
 
                         <!-- Company Name -->
                         <div class="mb-3">
                             <label class="form-label">إسم المؤسسة</label>
-                            <input type="text" value="<?php echo $data['company_name']?>" class="form-control" id="company_name" name="company_name" placeholder="أدخل إسم المؤسسة">
+                            <input type="text" value="<?php echo $data['company_name'] ?>" class="form-control" id="company_name" name="company_name" placeholder="أدخل إسم المؤسسة">
                         </div>
 
                         <!-- Address -->
                         <div class="mb-3">
                             <label class="form-label">الموقع</label>
-                            <input type="text" class="form-control" id="address" value="<?php echo $data['address']?>" name="address" placeholder="البلدة,الشارع...">
+                            <input type="text" class="form-control" id="address" value="<?php echo $data['address'] ?>" name="address" placeholder="البلدة,الشارع...">
                         </div>
 
                         <!-- Telephone -->
                         <div class="mb-3">
                             <label class="form-label">الهاتف</label>
-                            <input type="text" class="form-control" value="<?php echo $data['tel']?>" name="tel" id="tel" placeholder="+961 ...">
+                            <input type="text" class="form-control" value="<?php echo $data['tel'] ?>" name="tel" id="tel" placeholder="+961 ...">
                         </div>
 
+                        <div class="mb-3">
+                            <div style="width: 300px;">
+                                <label class="form-check-label" for="auto">اغلاق اليوم تلقئي ام يدوي</label>
+                                <select class="form-select" name="endOfDay" id="endDay"> 
+                                    <option value="auto">Auto</option>
+                                    <option value="manual">Manual</option>
+                                </select>
+                                <script>
+                                    document.getElementById("endDay").value = "<?php echo $data['endOfDay'] ?>";
+                                </script>
+
+                            </div>
+                        </div>
                         <!-- Save Button -->
                         <button type="submit" class="btn btn-primary w-100">حفظ التغييرات</button>
 
@@ -87,7 +99,6 @@
                 preview.classList.remove("d-none");
             }
         });
-        
     </script>
 
     </html>

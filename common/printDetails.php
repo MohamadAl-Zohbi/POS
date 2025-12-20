@@ -206,7 +206,7 @@ if ($factureLines->execute()) {
         }
 
         // Uncomment if you want it to auto-print
-        // window.print();
+        window.print();
     </script>
 </body>
 

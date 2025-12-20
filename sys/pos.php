@@ -1,6 +1,7 @@
 <?php
 include_once '../common/connect.php';
 include_once './check.php';
+include_once './closeDay.php';
 
 $categories = $db->prepare("SELECT * FROM categories");
 $categoriesList = [];
@@ -29,7 +30,6 @@ if ($getCustomers->execute()) {
     }
 }
 
-
 $getDollar = $db->prepare("SELECT dollar FROM data");
 $dollar;
 if ($getDollar->execute()) {
@@ -48,7 +48,7 @@ if ($getDollar->execute()) {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>POS</title>
     <link href="../common/bootstrap.css" rel="stylesheet">
-        <link rel="icon" type="image/png" href="../assets/pos-icon-2.jpg">
+    <link rel="icon" type="image/png" href="../assets/pos-icon-2.jpg">
 
 
     <style>
@@ -495,7 +495,7 @@ if ($getDollar->execute()) {
 </head>
 <script>
     let cart = {};
-    let customerId="";
+    let customerId = "";
 </script>
 
 <body>
@@ -510,7 +510,7 @@ if ($getDollar->execute()) {
             <div class="options">
                 <?php
                 foreach ($customers as $i => $item) {
-                    echo '<div class="option" onclick="selectOption(' . $item['id'] . ',`'.$item['name'].'`)">' . $item['name'] . '</div>';
+                    echo '<div class="option" onclick="selectOption(' . $item['id'] . ',`' . $item['name'] . '`)">' . $item['name'] . '</div>';
                 }
                 ?>
                 <!-- <div class="option" onclick="selectOption('Option 1')">Option 1</div>
@@ -584,7 +584,12 @@ if ($getDollar->execute()) {
         </section>
     </main>
 
-    <footer>&copy; 2025 My POS System</footer>
+    <footer>
+        <!-- &copy; 2025 My POS System -->
+        <div id="timer"></div>
+
+    </footer>
+
 
     <script>
         let total;
@@ -758,8 +763,8 @@ if ($getDollar->execute()) {
 
         function cancelInvoice() {
             cart = {};
-            customerId="";
-            document.getElementById("result").innerText="";
+            customerId = "";
+            document.getElementById("result").innerText = "";
             updateCart()
         }
         onload = () => {
@@ -876,11 +881,60 @@ if ($getDollar->execute()) {
         openPopup.onclick = () => popup.style.display = "flex";
         closePopup.onclick = () => popup.style.display = "none";
 
-        function selectOption(id,name) {
+        function selectOption(id, name) {
             result.innerText = "You selected: " + name;
             customerId = id;
             popup.style.display = "none";
         }
+
+
+
+    function startTimer() {
+        const timerEl = document.getElementById("timer");
+
+        const interval = setInterval(() => {
+            const now = new Date();
+
+            // Next day at 00:00:00
+            const nextDay = new Date(now);
+            nextDay.setHours(24, 0, 0, 0);
+
+            const diffMs = nextDay - now;
+
+            // If day already changed
+            if (diffMs <= 0) {
+                timerEl.innerHTML = "⛔ Day ended";
+                clearInterval(interval);
+                location.reload();
+                return;
+            }
+
+            // Show timer only in last 5 minutes
+            if (diffMs <= 5 * 60 * 1000) {
+                if (diffMs <= 1 * 60 * 1000) {
+                    alert("سيتم اعادة تحميل الصفحة خلال دقيقة الرجاء اغلاق الفاتورة")
+                }
+                const minutes = Math.floor(diffMs / 60000);
+                const seconds = Math.floor((diffMs % 60000) / 1000);
+
+                timerEl.innerHTML = `
+                    ⏳ Time left: 
+                    <strong>${minutes}:${seconds.toString().padStart(2, "0")}</strong>
+                `;
+
+                // 👉 your action (example)
+                if (minutes === 0 && seconds === 0) {
+                    console.log("Expired");
+                }
+            } else {
+                timerEl.innerHTML = ""; // hide before last 5 minutes
+            }
+
+        }, 1000);
+    }
+
+    startTimer();
+
     </script>
 </body>
 
