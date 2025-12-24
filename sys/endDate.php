@@ -60,7 +60,6 @@
 
 </head>
 <body>
-
   <div class="box">
     <h2 class="fw-bold mb-3">Your License Has Expired</h2>
     <p class="mb-4">To continue using the POS system, please contact us for renewal or assistance.</p>
@@ -75,6 +74,5 @@
 
     <p class="mt-4 small" style="opacity:0.8;">We’re here to help you get back up and running.</p>
   </div>
-
 </body>
 </html>

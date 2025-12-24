@@ -1,11 +1,4 @@
 <?php
-// try {
-//     $db_path = 'sqlite:C:/xampp/htdocs/POS/db/test.db';
-//     $db = new \PDO($db_path);
-// } catch (PDOException $e) {
-//     echo '<script>alert("undefined db")</script>';
-// }
-
 try {
     $db = new PDO(
         'sqlite:' . __DIR__ . '/../db/test.db',
