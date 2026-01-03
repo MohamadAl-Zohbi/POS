@@ -1,6 +1,6 @@
 <?php
 include_once '../common/connect.php';
-include_once './check.php';
+include_once './checkLogin.php';
 
 $result = $db->prepare("SELECT * FROM users WHERE username = :username");
 $result->bindParam(':username', $_SESSION['username']);

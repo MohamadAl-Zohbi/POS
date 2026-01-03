@@ -1,5 +1,5 @@
 // URL of your PHP API
-const apiUrl = "http://localhost/POS/sys/posApi.php";
+const apiUrl = "http://localhost/sys/posApi.php";
 
 // Data you want to send
 function addItems() {
@@ -21,13 +21,15 @@ function addItems() {
             if (!response.ok) {
                 const errorText = await response.text(); // get error details
                 throw new Error(`Error ${response.status}: ${errorText}`);
+                // throw new Error(`Error ${response.status}: you are sending an empty fucture`);
+
             }
             return response.json();
         })
         .then((data) => {
 
             // location.reload();
-            console.log(data);
+            // console.log(data);
             if (data.details == "done") {
                 cart = {};
                 customerId = "";
@@ -42,8 +44,9 @@ function addItems() {
                         localStorage.removeItem("window" + index);
                     }
                 });
-
+                return;
             }
+            alert("empty facture")
         })
         .catch((error) => {
             console.error("❌ Request failed:", error.message);

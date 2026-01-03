@@ -1,6 +1,6 @@
 <?php
 include_once './connect.php';
-include_once '../sys/check.php';
+include_once '../sys/checkLogin.php';
 
 
 $sales = $db->prepare("SELECT * FROM sales WHERE date >= '" . date('Y-m-d') . "' AND date <  '" . date('Y-m-d', strtotime('+1 day')) . "' ORDER BY id DESC;");

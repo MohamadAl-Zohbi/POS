@@ -11,6 +11,9 @@ if (isset($_POST['add_category'])) {
         header('Location: category.php');
     }
 }
+
+
+// --- Delete Category ---
 if (isset($_GET['delete'])) {
     $name = $_GET['delete'];
     $validate = $db->prepare("SELECT * FROM products WHERE category=:name");
@@ -26,6 +29,9 @@ if (isset($_GET['delete'])) {
         }
     }
 }
+
+
+// --- Edit Category ---
 if (isset($_POST['editCategory'])) {
     $name = $_POST['name'];
     $sql = "UPDATE categories SET name=:name WHERE name = :name";
@@ -35,6 +41,9 @@ if (isset($_POST['editCategory'])) {
         header('Location: category.php');
     }
 }
+
+
+// Select Categories 
 $categories = $db->prepare("SELECT * FROM categories");
 $categoriesSelect = [];
 if ($categories->execute()) {
@@ -42,13 +51,17 @@ if ($categories->execute()) {
         array_push($categoriesSelect, $rowe);
     }
 }
+
 ?>
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <title>الفئة</title>
     <link rel="icon" type="image/png" href="../assets/pos-icon-2.jpg">
+
     <link href="../common/bootstrap.css" rel="stylesheet">
     <style>
         #card {
@@ -63,14 +76,20 @@ if ($categories->execute()) {
         }
     </style>
 </head>
+
 <body>
     <?php include_once "./navbar.php" ?>
+
     <div class="container">
         <br>
         <form method="POST" class="mb-4 row g-2">
             <div class="col-md-2"><input type="text" name="name" placeholder="الاسم" class="form-control" required></div>
+
+
             <div class="col-md-2"><button type="submit" name="add_category" class="btn btn-primary w-100">Add Category</button></div>
         </form>
+
+        <!-- Products Table -->
         <table class="table table-bordered table-striped">
             <thead class="table-dark">
                 <tr>
@@ -80,11 +99,16 @@ if ($categories->execute()) {
                 </tr>
             </thead>
             <tbody>
+
+
+
+
                 <?php
                 foreach ($categoriesSelect as $i => $item) {
                     echo "<tr>";
                     echo '<td>' . $i + 1 . '</td>';
                     echo '<td>' . $item["name"] . '</td>';
+
                     echo '<td><a href="?delete=' . $item['name'] . '" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure?\')">حذف</a> &nbsp;';
                     echo '<a data-name="' . $item["name"] . '" class="btn btn-secondary btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editProductModal" onclick="showDataBeforeEdit(this)">تعديل</a></td>';
                     echo "</tr>";
@@ -93,21 +117,30 @@ if ($categories->execute()) {
             </tbody>
         </table>
     </div>
+
+
+
+
     <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
         <form method="GET">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
                         <h5 class="modal-title" id="editProductModalLabel">تعديل الفئة</h5>
                     </div>
+
                     <div class="mb-3" style="text-align: center;">
                         <label for="productName" class="form-label">اسم الفئة</label>
                         <input style="max-width: 500px; margin:auto;text-align:center;" type="text" class="form-control" id="productName" name="productName" placeholder="الاسم">
                     </div>
+
                     <div class="modal-footer">
+                        <!-- <button type="reset" class="btn btn-secondary">ا</button> -->
                         <button type="submit" name="editCategory" class="btn btn-primary">حفظ التغييرات</button>
                     </div>
+
                 </div>
             </div>
         </form>
@@ -119,7 +152,10 @@ if ($categories->execute()) {
         let productName = document.getElementById("productName");
         productName.value = e.dataset.name
     }
+
     let urlParams = new URLSearchParams(window.location.search);
+
+    // Check if "error" exists
     onload = () => {
         if (urlParams.has("error")) {
             alert(
@@ -132,4 +168,5 @@ if ($categories->execute()) {
         }
     }
 </script>
+
 </html>

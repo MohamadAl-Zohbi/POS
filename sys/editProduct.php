@@ -1,5 +1,5 @@
 <?php
-include_once './check.php';
+include_once './checkLogin.php';
 include_once './onlyAdmin.php';
 /**
  * Validate input based on type

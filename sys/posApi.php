@@ -1,13 +1,21 @@
 <?php
 include_once "../common/connect.php";
 header("Content-Type: application/json");
+
+// Allow only POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
+    http_response_code(405); // Method Not Allowed
     echo json_encode(["error" => "Only POST requests are allowed"]);
     exit;
 }
+
+// Get raw POST body
+//  {"items" , cart}
 $data = json_decode(file_get_contents("php://input"), true);
+
+// Check if data exists
 if (!$data || !isset($data['items']) || !isset($data['total']) || $data['total'] == 0) {
+    // http_response_code(400); // Bad Request
     echo json_encode(["error" => "Missing required fields"]);
     exit;
 }
@@ -30,6 +38,9 @@ if ($selectUser->execute()) {
         exit;
     }
 }
+
+
+
 $getDollar = $db->prepare("SELECT * FROM data");
 if ($getDollar->execute()) {
     $getDollar = $getDollar->fetchAll(PDO::FETCH_ASSOC);
@@ -47,7 +58,7 @@ if ($getDate->execute()) {
         $dataDate = $getDate[0]['date'];
     }
 }
-date_default_timezone_set('Asia/Beirut');
+
 $date      = $dataDate . " " . date("H:i:s");
 $totalUSD   = number_format(($data['total'] / $dollar), 2, ".", "");
 $totalLBP     = $data['total'];
@@ -63,6 +74,7 @@ $addSale->bindParam(':total_amount_usd', $totalUSD);
 $addSale->bindParam(':total_amount_lbp', $totalLBP);
 
 if ($addSale->execute()) {
+    // update the cusmtomer amount
     if (isset($data['customerId'])) {
 
         if ($data['customerId'] != "") {
@@ -88,6 +100,7 @@ if ($getSale->execute()) {
 
 $sql = "INSERT INTO sale_items(sale_id,product_id,quantity,unit_price,currency,date) VALUES";
 
+// prepare the main query
 
 $index = 0;
 foreach ($data['items'] as $i => $item) {
@@ -96,6 +109,8 @@ foreach ($data['items'] as $i => $item) {
     $quantity = $item["qty"];
     $price = $item["price"];
     $currency = $item["currency"];
+    // $sql .= "cx";
+    // saleid
     if ($index == 1) {
         $sql .= "(" . $saleID . "," . $productID . "," . $quantity . ',' . $price . ',"' . $currency . '","' . $date . '")';
     } else {
@@ -107,4 +122,7 @@ $addSalesLines = $db->prepare($sql);
 if (!$addSalesLines->execute()) {
     echo json_encode(['we have a problem in add lines']);
 }
+// Send response
+//done
 echo json_encode(['details' => "done"]);
+// exit;

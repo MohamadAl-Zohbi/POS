@@ -10,7 +10,6 @@ if (isset($_GET['updateDate'])) {
     }
 } else {
 }
-
 ?>
 <script>
     function updateDollar() {

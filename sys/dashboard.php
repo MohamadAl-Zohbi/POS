@@ -1,6 +1,6 @@
     <?php
     include_once '../common/connect.php';
-    include_once './check.php';
+    include_once './checkLogin.php';
     include_once './onlyAdmin.php';
     // get user count 
     $getUserCount = $db->prepare("SELECT count(id) as users FROM users");

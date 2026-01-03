@@ -1,6 +1,6 @@
     <?php
     include_once '../common/connect.php';
-    include_once './check.php';
+    include_once './checkLogin.php';
     include_once './onlyAdmin.php';
 
     $getData = $db->prepare("SELECT * FROM data");

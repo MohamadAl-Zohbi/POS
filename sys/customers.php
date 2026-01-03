@@ -16,19 +16,19 @@
             header('Location: customers.php');
         }
     }
+
+
+
+
+    // --- Pay ---
+
+
+    // continue here     you should add the buisness logic of the payment 
     if (isset($_GET['amount'])) {
+
         $id = $_GET['id'];
         $amount = $_GET['amount'];
-        $getDate = $db->prepare("SELECT date FROM data");
-        $dataDate;
-        if ($getDate->execute()) {
-            $getDate = $getDate->fetchAll(PDO::FETCH_ASSOC);
-            if (count($getDate)) {
-                $dataDate = $getDate[0]['date'];
-            }
-        }
-        date_default_timezone_set('Asia/Beirut');
-        $date      = $dataDate . " " . date("H:i:s");
+
         if (is_numeric($amount) & $amount > 0) {
             $validate = $db->prepare("SELECT balance FROM customers WHERE id=:id");
             $validate->bindParam(':id', $id);
@@ -40,13 +40,7 @@
                         $pay = $db->prepare("UPDATE customers SET balance = :balance WHERE id = :id");
                         $pay->bindParam(':id', $id);
                         $pay->bindParam(':balance', $balance);
-
-                        $addEvent = $db->prepare("INSERT INTO customer_payment (id,customer_id,date,amount,method,type) 
-                        VALUES (null,:customer_id,'$date',:amount,'cash','cash')");
-
-                        $addEvent->bindParam(':customer_id', $id);
-                        $addEvent->bindParam(':amount', $amount);
-                        if ($pay->execute() & $addEvent->execute()) header('Location: customers.php');
+                        if ($pay->execute()) header('Location: customers.php');
                     } else {
                         echo '<script>alert("يجب ان لا يكون المبلغ اكبر من الحساب")</script>';
                     }
@@ -58,22 +52,31 @@
             echo '<script>alert("الرجاء ادخال رقم")</script>';
         }
     }
+
+
+    // --- Edit Customer ---
     if (isset($_POST['editCustomer'])) {
         $name      = $_POST['name'];
         $address   = $_POST['address'];
         $balance     = $_POST['balance'];
         $id     = $_POST['id'];
+
         $sql = "UPDATE customers SET name=:name, address=:address, balance=:balance WHERE id = :id";
+
         $editCustomer = $db->prepare($sql);
         $editCustomer->bindParam(':name', $name);
         $editCustomer->bindParam(':address', $address);
         $editCustomer->bindParam(':balance', $balance);
         $editCustomer->bindParam(':id', $id);
+
         if ($editCustomer->execute()) {
             header('Location: customers.php');
         }
     }
+
+
     $result = $db->prepare("SELECT * FROM customers");
+
     $data = [];
     if ($result->execute()) {
         while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
@@ -81,13 +84,15 @@
         }
     }
     ?>
+
  <!DOCTYPE html>
  <html lang="ar" dir="rtl">
 
  <head>
      <meta charset="UTF-8">
      <title>العملاء</title>
-     <link rel="icon" type="image/png" href="../assets/pos-icon-2.jpg">
+         <link rel="icon" type="image/png" href="../assets/pos-icon-2.jpg">
+
      <link href="../common/bootstrap.css" rel="stylesheet">
      <style>
          #card {
@@ -99,19 +104,26 @@
              margin: 0;
              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
              background: #f8f9fa;
+             /* padding: 20px; */
          }
      </style>
  </head>
 
  <body>
      <?php include_once "./navbar.php" ?>
+
      <div class="container">
          <br>
+         <!-- Add Customer Form -->
          <form method="POST" class="mb-4 row g-2">
              <div class="col-md-2"><input type="text" name="name" placeholder="الاسم" class="form-control" required></div>
              <div class="col-md-2"><input type="text" name="address" placeholder="الموقع" class="form-control" required></div>
+             <!-- <div class="col-md-2"><input type="text" name="barcode" placeholder="باركود" class="form-control" required></div> -->
+
              <div class="col-md-2"><button type="submit" name="add_customer" class="btn btn-primary w-100">اضافة عميل</button></div>
          </form>
+
+         <!-- Customers Table -->
          <table class="table table-bordered table-striped">
              <thead class="table-dark">
                  <tr>
@@ -127,9 +139,13 @@
                     foreach ($data as $i => $item) {
                         echo "<tr>";
                         echo '<td>' . $i + 1 . '</td>';
+                        // echo '<td>' . $item["id"] . '</td>';
                         echo '<td>' . $item["name"] . '</td>';
                         echo '<td>' . $item["address"] . '</td>';
+                        // echo '<td>' .  number_format($item["price"], 2, ".", ",") . '</td>';
                         echo '<td>' . number_format($item["balance"], 2, ".", ",") . 'L.L</td>';
+                        // echo '<td>' . $item["balance"] . '</td>';
+
                         echo '<td><a data-id="' . $item['id'] . '" class="btn btn-primary btn-sm" onclick="pay(this)">Pay</a> &nbsp;';
                         echo '<a data-name=' . $item["name"] . ' data-id=' . $item['id'] . ' data-address="' . $item["address"] . '" data-balance="' . $item["balance"] . '" class="btn btn-secondary btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editCustomerModal" onclick="showDataBeforeEdit(this)">Edit</a></td>';
                         echo "</tr>";
@@ -138,6 +154,10 @@
              </tbody>
          </table>
      </div>
+
+
+
+
      <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
          <form method="POST">
              <div class="modal-dialog modal-lg">
@@ -166,16 +186,24 @@
                                  <label id="editBalanceLabel"></label>
                                  <script>
                                      document.getElementById("customerBalance").addEventListener("input", function(e) {
+                                         // remove any non-digit characters
                                          let value = e.target.value.replace(/\D/g, "");
+
+                                         // format with thousands separator
                                          document.getElementById("editBalanceLabel").innerText = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                      });
                                  </script>
                              </div>
+
                          </div>
+
+
                      </div>
                      <div class="modal-footer">
+                         <!-- <button type="reset" class="btn btn-secondary">ا</button> -->
                          <button type="submit" name="editCustomer" class="btn btn-primary">حفظ التغييرات</button>
                      </div>
+
                  </div>
              </div>
          </form>
@@ -195,19 +223,36 @@
          customerBalance.value = e.dataset.balance
      }
 
+
+
      function pay(e) {
          let id = e.dataset.id;
          let amount = prompt("ادخل المبلغ");
          while (isNaN(amount) || amount == "") {
              amount = prompt("ادخل المبلغ");
          }
+
          if (amount === null) {
              return false;
          }
+
          let url = "customers.php?id=" + encodeURIComponent(id) + "&amount=" + amount;
+
          window.location.href = url;
      }
+
+
+     // function openDialog() {
+     //     document.getElementById("dialog").style.display = "flex";
+     // }
+
+     // function closeDialog() {
+     //     document.getElementById("dialog").style.display = "none";
+     // }
+
      let urlParams = new URLSearchParams(window.location.search);
+
+     // Check if "error" exists
      onload = () => {
          if (urlParams.has("error")) {
              alert(

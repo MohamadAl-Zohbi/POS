@@ -1,3 +1,14 @@
+<?php
+include_once '../common/connect.php';
+
+$getData = $db->prepare("SELECT * FROM data");
+$data;
+if ($getData->execute()) {
+    $getData = $getData->fetchAll(PDO::FETCH_ASSOC);
+    $data = $getData[0];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -50,7 +61,8 @@
         th {
             border-bottom: 1px dashed #000;
         }
-        tr{
+
+        tr {
             margin-bottom: 20px;
             /* border-bottom: 1px dashed black; */
         }
@@ -89,10 +101,11 @@
 
 <body>
     <div class="header">
-        <h2>SuperMarket X</h2>
-        <p>Beirut - Lebanon</p>
-        <p>Tel: 01 234 567</p>
-        <p>Date: 2025-10-24 21:00</p>
+        <h2>SuperMarket <?php echo $data['company_name']?></h2>
+        <p><?php echo $data['address']?></p>
+        <p>Tel: <?php echo $data['tel']?></p>
+        <p>Date: <?php date_default_timezone_set('Asia/Beirut');
+ echo date("Y-m-d H:i:s");?></p>
     </div>
 
     <table>
@@ -146,10 +159,10 @@
                 body.innerHTML +=
                     `
                     <tr>
-                    <td>${key}</td>
+                    <td style="max-width:100px;">${key}</td>
                     <td>${formatNumber(value.qty)}</td>
-                    <td>${formatNumber(value.price)}/</td>
-                    <td>${formatNumber(value.price * value.qty)}</td>
+                    <td>${formatNumber(value.price)} ${value.currency == "usd" ? "$":"L" }</td>
+                    <td>${formatNumber(value.price * value.qty)} ${value.currency == "usd" ? "$":"L" }</td>
                     </tr>
                     <br>
                     `;

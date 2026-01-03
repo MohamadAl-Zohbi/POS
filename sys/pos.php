@@ -1,6 +1,6 @@
 <?php
 include_once '../common/connect.php';
-include_once './check.php';
+include_once './checkLogin.php';
 include_once './closeDay.php';
 
 $categories = $db->prepare("SELECT * FROM categories");
@@ -53,11 +53,17 @@ if ($getDollar->execute()) {
 
     <style>
         :root {
-            --primary: #007bff;
-            --category: #ddd;
+            /* --primary: #007bff; */
+            --primary: #7D3F6E;
+
+            --category: #CE8EB3;
+            /* --category: #ddd; */
             --category-text: #000;
+            /* --category-text: #000; */
             --secondary: #5fa6f1;
-            --bg: #f4f6f8;
+            /* --secondary: #5fa6f1; */
+            --bg: #8F608C;
+            /* --bg: #f4f6f8; */
             --text: #333;
         }
 
@@ -105,7 +111,7 @@ if ($getDollar->execute()) {
         }
 
         section {
-            background: white;
+            background: #F2B3BE;
             border-radius: 8px;
             padding: 15px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -552,7 +558,7 @@ if ($getDollar->execute()) {
                     <div class="table">4</div>
                 </div>
                 <button onclick="save()">Save</button>
-                <button onclick="if(confirm('Are you sure?')){handleYes() }" style="background-color:red;">Clear All Tables</button>
+                <button onclick="if(confirm('Are you sure?')){handleYes() }" style="background-color:#CE8EB3;color:white;">Clear All Tables</button>
 
             </div>
         </section>
@@ -581,6 +587,7 @@ if ($getDollar->execute()) {
             <button id="openPopup" class=" btn-danger">unpaid</button>
             <!-- <button class=" btn-danger" onclick="print()">unpaid</button> -->
             <button onclick="cancelInvoice()">Cancel</button>
+            <button onclick="location.replace('./logout.php')" style="color: #CE8EB3; ">LogOut</button>
         </section>
     </main>
 
@@ -765,6 +772,13 @@ if ($getDollar->execute()) {
             cart = {};
             customerId = "";
             document.getElementById("result").innerText = "";
+            let index = 0;
+            document.querySelectorAll('.table').forEach((tb) => {
+                    index++;
+                    if (tb.classList.value.includes('active')) {
+                        localStorage.removeItem("window" + index);
+                    }
+                });
             updateCart()
         }
         onload = () => {
@@ -795,7 +809,7 @@ if ($getDollar->execute()) {
             if (e.key === 'Enter') {
                 let i = 0;
                 productsWithCategory.forEach(item => {
-                    if (item['name'] == e.target.value) {
+                    if (item['barcode'] == e.target.value) {
                         addToCart(item['name'], item['price'], item['currency'], item['id']);
                         i++;
                     }

@@ -67,6 +67,7 @@
 <body>
     <?php
     include_once '../common/connect.php';
+    include_once './check.php';
     ?>
 
 

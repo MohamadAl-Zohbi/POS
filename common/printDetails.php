@@ -1,6 +1,6 @@
 <?php
 include_once '../common/connect.php';
-// include_once './check.php';
+// include_once './checkLogin.php';
 // include_once './onlyAdmin.php';
 
 
@@ -14,6 +14,14 @@ if ($factureLines->execute()) {
     while ($rowe = $factureLines->fetch(\PDO::FETCH_BOTH)) {
         array_push($factureSelect, $rowe);
     }
+}
+
+
+$getData = $db->prepare("SELECT * FROM data");
+$data;
+if ($getData->execute()) {
+    $getData = $getData->fetchAll(PDO::FETCH_ASSOC);
+    $data = $getData[0];
 }
 
 ?>
@@ -112,10 +120,10 @@ if ($factureLines->execute()) {
 <body>
     <div style="background-color: white; padding:10px;">
         <div class="header">
-            <h2>SuperMarket X</h2>
-            <p>Beirut - Lebanon</p>
-            <p>Tel: 01 234 567</p>
-            <p>Date: 2025-10-24 21:00</p>
+            <h2>SuperMarket <?php echo $data['company_name'];?></h2>
+            <p><?php echo $data['address'];?></p>
+            <p>Tel: <?php echo $data['tel'];?></p>
+            <p>Date: <?php echo $factureSelect[0]['date'];?></p>
         </div>
 
         <table>

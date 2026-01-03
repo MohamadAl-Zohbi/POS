@@ -1,0 +1,22 @@
+# Main index
+DirectoryIndex index.php
+
+# Disable directory listing
+Options -Indexes
+
+# Clean URLs
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]
+
+# Protect sensitive files
+<FilesMatch "^(\.env|config\.php|database\.php|license\.key)$">
+    Require all denied
+</FilesMatch>
+
+# Basic security headers (safe)
+<IfModule mod_headers.c>
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
