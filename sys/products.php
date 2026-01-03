@@ -1,6 +1,6 @@
 <?php
 include_once '../common/connect.php';
-include_once './check.php';
+include_once './checkLogin.php';
 include_once './onlyAdmin.php';
 if (isset($_POST['add_product'])) {
     $name      = $_POST['name'];
@@ -26,8 +26,6 @@ if (isset($_POST['add_product'])) {
         header('Location: products.php');
     }
 }
-
-// --- Delete Product ---
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $validate = $db->prepare("SELECT * FROM sale_items WHERE product_id=:id");
@@ -82,96 +80,21 @@ if ($categories->execute()) {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f8f9fa;
-            /* padding: 20px; */
         }
 
-
-        /* 
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
+        td {
+            max-width: 250px;
         }
-
-        .modal {
-            background-color: white; 
-            padding: 20px 30px;
-            border-radius: 8px;
-            max-width: 400px;
-            color: red;
-            z-index: 1000;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            text-align: center;
-        }
-
-        .modal h2 {
-            margin-bottom: 15px;
-        }
-
-        .modal-buttons {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-around;
-        }
-
-        .modal-buttons button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-yes {
-            background-color: #3498db;
-            color: white;
-        }
-
-        .btn-no {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        .btn-yes:hover {
-            background-color: #2980b9;
-        } */
     </style>
 </head>
 
 <body>
     <?php include_once "./navbar.php" ?>
-    <!-- <div class="modal-overlay" id="dialog">
-        <div class="modal">
-            <h2>
-                
-            </h2>
-            <div class="modal-buttons">
-                <button class="btn-no" onclick="closeDialog()">OK</button>
-            </div>
-        </div>
-    </div> -->
-
     <div class="container">
         <br>
-        <!-- <a href="./dashboard.php" style="float: right; text-decoration: none;"><h4>العودة الى الصفحة الرئيسية </h4></a>
-
-        <h2 class="mb-4">Products Control
-            <div class="col-md-2"><input type="number" readonly placeholder="Dollar" step="0.01" class="form-control"></div>
-        </h2> -->
-
-        <!-- Add Product Form -->
         <form method="POST" class="mb-4 row g-2">
             <div class="col-md-2"><input type="text" name="name" placeholder="الاسم" class="form-control" required></div>
             <div class="col-md-2"><input type="text" name="barcode" placeholder="باركود" class="form-control" required></div>
-            <!-- format the number -->
             <div class="col-md-1"><input id="addPrice" type="number" step="0.01" name="price" placeholder="السعر" class="form-control" required>
                 <label id="addPriceLabel">
 
@@ -179,38 +102,30 @@ if ($categories->execute()) {
             </div>
             <script>
                 document.getElementById("addPrice").addEventListener("input", function(e) {
-                    // remove any non-digit characters
                     let value = e.target.value.replace(/\D/g, "");
-
-                    // format with thousands separator
                     document.getElementById("addPriceLabel").innerText = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 });
             </script>
             <div class="col-md-1"><input id="addCostPrice" type="number" step="0.01" name="cost_price" placeholder="التكلفة" class="form-control" required>
                 <label id="addCostPriceLabel">
-
                 </label>
             </div>
             <script>
                 document.getElementById("addCostPrice").addEventListener("input", function(e) {
-                    // remove any non-digit characters
                     let value = e.target.value.replace(/\D/g, "");
-
-                    // format with thousands separator
                     document.getElementById("addCostPriceLabel").innerText = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 });
             </script>
             <div class="col-md-1">
-                <select name="currency" class="form-select">
+                <select name="currency" id="sessionCurrency" class="form-select">
                     <option value="usd">USD</option>
                     <option value="lbp">LBP</option>
                 </select>
             </div>
-
             <div class="col-md-1"><input type="number" name="stock_quantity" placeholder="الكمية" class="form-control" required></div>
             <div class="col-md-2">
                 <select name="category" class="form-select">
-                    <!-- <option value=""></option> -->
+                    <option value=""></option>
                     <?php
                     foreach ($categoriesSelect as $i => $item) {
                         echo '<option value="' . $item["name"] . '">' . $item["name"] . '</option>';
@@ -221,8 +136,6 @@ if ($categories->execute()) {
 
             <div class="col-md-2"><button type="submit" name="add_product" class="btn btn-primary w-100">Add Product</button></div>
         </form>
-
-        <!-- Products Table -->
         <table class="table table-bordered table-striped">
             <thead class="table-dark">
                 <tr>
@@ -259,10 +172,6 @@ if ($categories->execute()) {
             </tbody>
         </table>
     </div>
-
-
-
-
     <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
         <form action="editProduct.php" method="GET">
             <div class="modal-dialog modal-lg">
@@ -292,10 +201,7 @@ if ($categories->execute()) {
                                 <label id="editPriceLabel"></label>
                                 <script>
                                     document.getElementById("price").addEventListener("input", function(e) {
-                                        // remove any non-digit characters
                                         let value = e.target.value.replace(/\D/g, "");
-
-                                        // format with thousands separator
                                         document.getElementById("editPriceLabel").innerText = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                     });
                                 </script>
@@ -306,10 +212,7 @@ if ($categories->execute()) {
                                 <label id="editCostPriceLabel"></label>
                                 <script>
                                     document.getElementById("costPrice").addEventListener("input", function(e) {
-                                        // remove any non-digit characters
                                         let value = e.target.value.replace(/\D/g, "");
-
-                                        // format with thousands separator
                                         document.getElementById("editCostPriceLabel").innerText = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                     });
                                 </script>
@@ -329,6 +232,7 @@ if ($categories->execute()) {
                         <div class="mb-3">
                             <label for="category" class="form-label">الفئة</label>
                             <select class="form-select" id="category" name="categoryId">
+                                <option value=""></option>
                                 <?php
                                 foreach ($categoriesSelect as $i => $item) {
                                     echo '<option value="' . $item["name"] . '">' . $item["name"] . '</option>';
@@ -338,7 +242,6 @@ if ($categories->execute()) {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <!-- <button type="reset" class="btn btn-secondary">ا</button> -->
                         <button type="submit" name="editProduct" class="btn btn-primary">حفظ التغييرات</button>
                     </div>
 
@@ -368,21 +271,8 @@ if ($categories->execute()) {
         category.value = e.dataset.category
         currency.value = e.dataset.currency
     }
-
-
-    // function openDialog() {
-    //     document.getElementById("dialog").style.display = "flex";
-    // }
-
-    // function closeDialog() {
-    //     document.getElementById("dialog").style.display = "none";
-    // }
-
     let urlParams = new URLSearchParams(window.location.search);
-
-    // Check if "error" exists
     onload = () => {
-        document.getElementById("category").value = "test";
         if (urlParams.has("error")) {
             alert(
                 "<?php
@@ -392,6 +282,12 @@ if ($categories->execute()) {
                     ?>"
             )
         }
+        if (sessionStorage.getItem("currency")) {
+            document.getElementById("sessionCurrency").value = sessionStorage.getItem("currency");
+        }
+        document.getElementById("sessionCurrency").addEventListener("change", () => {
+            sessionStorage.setItem("currency", document.getElementById("sessionCurrency").value);
+        });
     }
 </script>
 

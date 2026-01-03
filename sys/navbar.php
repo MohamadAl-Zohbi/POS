@@ -1,4 +1,5 @@
 <?php
+
 $getDollar = $db->prepare("SELECT dollar FROM data");
 $dollar;
 if ($getDollar->execute()) {
@@ -49,15 +50,10 @@ if (isset($_GET['updateDollar'])) {
                 echo "التقرير اليومي";
             } else if (str_contains($url['path'], "productReport")) {
                 echo "تقرير بالمبيعات";
-            }else if (str_contains($url['path'], "settings")) {
+            } else if (str_contains($url['path'], "settings")) {
                 echo "الإعدادات";
             }
-
-
-
             ?>
-
-
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -91,6 +87,10 @@ if (isset($_GET['updateDollar'])) {
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="./dailyReport.php">الرصيد اليومي</a></li>
                         <li><a class="dropdown-item" href="./productReport.php">تقرير بالمبيعات</a></li>
+                        <li><a class="dropdown-item disabled" href="./summaryReport.php">تقرير مختصر</a></li>
+                        <!-- <li class="dropdown-item">
+                            <a class="dropdown-link disabled">تقرير مختصر</a>
+                        </li> -->
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -100,9 +100,6 @@ if (isset($_GET['updateDollar'])) {
                         <li><a class="dropdown-item" style="color: red;" href="./pos.php">POS</a></li>
                     </ul>
                 </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-                </li> -->
             </ul>
             <form class="d-flex" role="search">
                 <input style="direction:ltr; text-align:center;" class="form-control me-2" style="text-align: center;" type="text" value="<?php echo $dollar ?> L.L" readonly placeholder="Dollar" />
