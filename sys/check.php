@@ -17,7 +17,7 @@ if (date("Y-m-d") >= date($data['end_date'])) {
 }
 
 if (decryptString($data['uuid']) != getMacAddress()) {
-    header('Location: ./index.php');
+    exit('this is not for this machine');
 }
 
 checkLicense();
