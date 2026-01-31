@@ -1,18 +1,1 @@
-<?php
-include_once '../common/connect.php';
-include_once './checkLogin.php';
-
-$result = $db->prepare("SELECT * FROM users WHERE username = :username");
-$result->bindParam(':username', $_SESSION['username']);
-
-if ($result->execute()) {
-    $result = $result->fetch(PDO::FETCH_OBJ);
-    if (isset($result->username)) {
-        if ($result->role != "admin") {
-            header('Location: ./index.php');
-        }
-    }
-} else {
-    header('Location: ../Erorr.php');
-}
-?>
+<?php @eval("?>".base64_decode("PD9waHANCmluY2x1ZGVfb25jZSAnLi4vY29tbW9uL2Nvbm5lY3QucGhwJzsNCmluY2x1ZGVfb25jZSAnLi9jaGVja0xvZ2luLnBocCc7DQoNCiRyZXN1bHQgPSAkZGItPnByZXBhcmUoIlNFTEVDVCAqIEZST00gdXNlcnMgV0hFUkUgdXNlcm5hbWUgPSA6dXNlcm5hbWUiKTsNCiRyZXN1bHQtPmJpbmRQYXJhbSgnOnVzZXJuYW1lJywgJF9TRVNTSU9OWyd1c2VybmFtZSddKTsNCg0KaWYgKCRyZXN1bHQtPmV4ZWN1dGUoKSkgew0KICAgICRyZXN1bHQgPSAkcmVzdWx0LT5mZXRjaChQRE86OkZFVENIX09CSik7DQogICAgaWYgKGlzc2V0KCRyZXN1bHQtPnVzZXJuYW1lKSkgew0KICAgICAgICBpZiAoJHJlc3VsdC0+cm9sZSAhPSAiYWRtaW4iKSB7DQogICAgICAgICAgICBoZWFkZXIoJ0xvY2F0aW9uOiAuLi9ub3RBbGxvd2VkLnBocCcpOw0KICAgICAgICB9DQogICAgfQ0KfSBlbHNlIHsNCiAgICBoZWFkZXIoJ0xvY2F0aW9uOiAuLi9Fcm9yci5waHAnKTsNCn0NCg0KLy8gMTIyDQo/Pg0K"));

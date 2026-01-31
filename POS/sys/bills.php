@@ -2,15 +2,7 @@
 include_once '../common/connect.php';
 include_once './checkLogin.php';
 include_once './onlyAdmin.php';
-// if (isset($_POST['add_category'])) {
-//     $name      = $_POST['name'];
-//     $sql = "INSERT INTO categories (name) VALUES (:name)";
-//     $addCategory = $db->prepare($sql);
-//     $addCategory->bindParam(':name', $name);
-//     if ($addCategory->execute()) {
-//         header('Location: category.php');
-//     }
-// }
+
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $deleteSale = $db->prepare("DELETE FROM sales WHERE id=:id");

@@ -73,7 +73,16 @@ $addSale->bindParam(':userID', $userID);
 $addSale->bindParam(':total_amount_usd', $totalUSD);
 $addSale->bindParam(':total_amount_lbp', $totalLBP);
 
+
+
 if ($addSale->execute()) {
+    $getSale = $db->prepare("SELECT MAX(id) as id FROM sales");
+    if ($getSale->execute()) {
+        $getSale = $getSale->fetchAll(PDO::FETCH_ASSOC);
+        if (count($getSale) > 0) {
+            $saleID = $getSale[0]['id'];
+        }
+    }
     // update the cusmtomer amount
     if (isset($data['customerId'])) {
 
@@ -86,17 +95,26 @@ if ($addSale->execute()) {
             $updateCustomerAmount->bindParam(':balance', $totalLBP);
             $updateCustomerAmount->bindParam(':id', $customerId);
             $updateCustomerAmount->execute();
+
+            // add the log debts with the facture id
+            $addDebtLog = $db->prepare("INSERT INTO customer_debts_logs(id,customer_id,facture_id,amount,date)
+             VALUES
+             (null,:customer_id,:facture_id,:amount,'$date');");
+            $addDebtLog->bindParam(':customer_id', $customerId);
+            $addDebtLog->bindParam(':facture_id', $saleID);
+            $addDebtLog->bindParam(':amount', $totalLBP);
+
+            if ($addDebtLog->execute()) {
+                $addDebtLog = $addDebtLog->fetchAll(PDO::FETCH_ASSOC);
+                if (count($addDebtLog) > 0) {
+                    $saleID = $addDebtLog[0]['id'];
+                }
+            }
         }
     }
 }
 
-$getSale = $db->prepare("SELECT MAX(id) as id FROM sales");
-if ($getSale->execute()) {
-    $getSale = $getSale->fetchAll(PDO::FETCH_ASSOC);
-    if (count($getSale) > 0) {
-        $saleID = $getSale[0]['id'];
-    }
-}
+
 
 $sql = "INSERT INTO sale_items(sale_id,product_id,quantity,unit_price,currency,date) VALUES";
 

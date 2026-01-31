@@ -62,7 +62,6 @@ if (isset($_GET['search'])) {
     <meta charset="UTF-8">
     <title>الفواتير</title>
     <link rel="icon" type="image/png" href="../assets/pos-icon-2.jpg">
-
     <link href="../common/bootstrap.css" rel="stylesheet">
     <style>
         #card {
