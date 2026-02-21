@@ -10,9 +10,16 @@ if (isset($_POST['add_product'])) {
     $stock_quantity  = $_POST['stock_quantity'];
     $category  = $_POST['category'];
     $currency  = $_POST['currency'];
-
-    $sql = "INSERT INTO products (name, barcode, price, cost_price, stock_quantity, category,currency) 
-            VALUES (:name,:barcode,:price,:costprice,:stock_quantity,:category,:currency)";
+    $img = "";
+    if (isset($_FILES['img']) && $_FILES['img']['error'] === 0) {
+        $img = time() . "_" . $_FILES['img']['name'];
+        $targetPath = "../uploads/" . $img;
+        if (!move_uploaded_file($_FILES['img']['tmp_name'], $targetPath)) {
+            die("Upload failed");
+        }
+    }
+    $sql = "INSERT INTO products (name, barcode, price, cost_price, stock_quantity, category,currency,img) 
+            VALUES (:name,:barcode,:price,:costprice,:stock_quantity,:category,:currency,:img)";
 
     $addProduct = $db->prepare($sql);
     $addProduct->bindParam(':name', $name);
@@ -22,6 +29,7 @@ if (isset($_POST['add_product'])) {
     $addProduct->bindParam(':stock_quantity', $stock_quantity);
     $addProduct->bindParam(':category', $category);
     $addProduct->bindParam(':currency', $currency);
+    $addProduct->bindParam(':img', $img);
     if ($addProduct->execute()) {
         header('Location: products.php');
     }
@@ -41,6 +49,20 @@ if (isset($_GET['delete'])) {
         }
     }
 }
+
+// update product qtc
+if (isset($_GET['qtc']) && isset($_GET['qtcId'])) {
+    $id = $_GET['qtcId'];
+    $productQtc = $db->prepare("UPDATE products set stock_quantity = stock_quantity + :qtc WHERE id = :id");
+    $productQtc->bindParam(':qtc', $_GET['qtc']);
+    $productQtc->bindParam(':id', $id);
+    if (!$productQtc->execute()) {
+        echo '<script>alert("حدث خطأ اثناء الاضافة الرجاء اعادت المحاولة")</script>';
+    }
+    header('Location: ?');
+}
+
+
 $result = $db->prepare("SELECT * FROM products");
 $categories = $db->prepare("SELECT * FROM categories");
 
@@ -92,7 +114,7 @@ if ($categories->execute()) {
     <?php include_once "./navbar.php" ?>
     <div class="container">
         <br>
-        <form method="POST" class="mb-4 row g-2">
+        <form method="POST" enctype="multipart/form-data" class="mb-4 row g-2">
             <div class="col-md-2"><input type="text" name="name" placeholder="الاسم" class="form-control" required></div>
             <div class="col-md-2"><input type="text" name="barcode" placeholder="باركود" class="form-control" required></div>
             <div class="col-md-1"><input id="addPrice" type="number" step="0.01" name="price" placeholder="السعر" class="form-control" required>
@@ -121,6 +143,9 @@ if ($categories->execute()) {
                     <option value="usd">USD</option>
                     <option value="lbp">LBP</option>
                 </select>
+            </div>
+            <div class="col-md-1">
+                <input name="img" type="file" class="form-control">
             </div>
             <div class="col-md-1"><input type="number" name="stock_quantity" placeholder="الكمية" class="form-control" required></div>
             <div class="col-md-2">
@@ -165,7 +190,9 @@ if ($categories->execute()) {
                     echo '<td>' . $item["stock_quantity"] . '</td>';
                     echo '<td>' . $item["category"] . '</td>';
                     echo '<td><a href="?delete=' . $item['id'] . '" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure?\')">Delete</a> &nbsp;';
-                    echo '<a data-category="' . $item["category"] . '" data-id=' . $item['id'] . ' data-stock_quantity="' . $item["stock_quantity"] . '" data-name="' . $item["name"] . '" data-currency="' . $item["currency"] . '" data-barcode="' . $item["barcode"] . '" data-price="' . $item["price"] . '" data-cost_price="' . $item["cost_price"] . '" class="btn btn-secondary btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editProductModal" onclick="showDataBeforeEdit(this)">Edit</a></td>';
+                    echo '<a data-category="' . $item["category"] . '" data-id=' . $item['id'] . ' data-stock_quantity="' . $item["stock_quantity"] . '" data-name="' . $item["name"] . '" data-currency="' . $item["currency"] . '" data-barcode="' . $item["barcode"] . '" data-price="' . $item["price"] . '" data-cost_price="' . $item["cost_price"] . '" class="btn btn-secondary btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editProductModal" onclick="showDataBeforeEdit(this)">Edit</a>&nbsp;
+                    <a class="btn btn-secondary btn-sm btn-primary" onclick="editStockDetails(' . $item['id'] . ')">Add</a>
+                    </td>';
                     echo "</tr>";
                 }
                 ?>
@@ -288,6 +315,21 @@ if ($categories->execute()) {
         document.getElementById("sessionCurrency").addEventListener("change", () => {
             sessionStorage.setItem("currency", document.getElementById("sessionCurrency").value);
         });
+    }
+
+    function editStockDetails(id) {
+        let qtc = Number(prompt("ادخل الكمية الجديدة:"));
+        while (isNaN(qtc) || qtc == "") {
+            qtc = prompt("ادخل الكمية الجديدة");
+        }
+        if (qtc === null) {
+            return false;
+        }
+        let url = "?qtc=" + qtc + "&qtcId=" + id;
+        window.location.href = url;
+
+        console.log(qtc)
+
     }
 </script>
 

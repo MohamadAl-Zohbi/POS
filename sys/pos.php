@@ -141,14 +141,16 @@ if ($getDollar->execute()) {
         .product {
             background: var(--category);
             color: var(--category-text);
-            padding: 8px;
+            padding: 8px 2px;
             border-radius: 6px;
             text-align: center;
             cursor: pointer;
             font-size: 14px;
             display: inline-block;
             margin: 5px 0px;
-            /* height: 100px; */
+            height: 150px;
+            overflow: hidden;
+            width: 200px;
         }
 
         /* Cart area */
@@ -774,11 +776,11 @@ if ($getDollar->execute()) {
             document.getElementById("result").innerText = "";
             let index = 0;
             document.querySelectorAll('.table').forEach((tb) => {
-                    index++;
-                    if (tb.classList.value.includes('active')) {
-                        localStorage.removeItem("window" + index);
-                    }
-                });
+                index++;
+                if (tb.classList.value.includes('active')) {
+                    localStorage.removeItem("window" + index);
+                }
+            });
             updateCart()
         }
         onload = () => {
@@ -798,7 +800,11 @@ if ($getDollar->execute()) {
             productsWithCategory.forEach(item => {
                 document.getElementById("product-list").innerHTML +=
                     `
-                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-id="${item['id']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
+                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-id="${item['id']}" data-price="${item['price']}">${item['name']}<br>${item['price']}
+                <div>
+                    ${item['img'] ? "<img src='../uploads/"+item['img']+"' width='100' height='100'/>":""}
+                </div>
+                </div>
                 `;
             });
         }
@@ -903,52 +909,51 @@ if ($getDollar->execute()) {
 
 
 
-    function startTimer() {
-        const timerEl = document.getElementById("timer");
+        function startTimer() {
+            const timerEl = document.getElementById("timer");
 
-        const interval = setInterval(() => {
-            const now = new Date();
+            const interval = setInterval(() => {
+                const now = new Date();
 
-            // Next day at 00:00:00
-            const nextDay = new Date(now);
-            nextDay.setHours(24, 0, 0, 0);
+                // Next day at 00:00:00
+                const nextDay = new Date(now);
+                nextDay.setHours(24, 0, 0, 0);
 
-            const diffMs = nextDay - now;
+                const diffMs = nextDay - now;
 
-            // If day already changed
-            if (diffMs <= 0) {
-                timerEl.innerHTML = "⛔ Day ended";
-                clearInterval(interval);
-                location.reload();
-                return;
-            }
-
-            // Show timer only in last 5 minutes
-            if (diffMs <= 5 * 60 * 1000) {
-                if (diffMs <= 1 * 60 * 1000) {
-                    alert("سيتم اعادة تحميل الصفحة خلال دقيقة الرجاء اغلاق الفاتورة")
+                // If day already changed
+                if (diffMs <= 0) {
+                    timerEl.innerHTML = "⛔ Day ended";
+                    clearInterval(interval);
+                    location.reload();
+                    return;
                 }
-                const minutes = Math.floor(diffMs / 60000);
-                const seconds = Math.floor((diffMs % 60000) / 1000);
 
-                timerEl.innerHTML = `
+                // Show timer only in last 5 minutes
+                if (diffMs <= 5 * 60 * 1000) {
+                    if (diffMs <= 1 * 60 * 1000) {
+                        alert("سيتم اعادة تحميل الصفحة خلال دقيقة الرجاء اغلاق الفاتورة")
+                    }
+                    const minutes = Math.floor(diffMs / 60000);
+                    const seconds = Math.floor((diffMs % 60000) / 1000);
+
+                    timerEl.innerHTML = `
                     ⏳ Time left: 
                     <strong>${minutes}:${seconds.toString().padStart(2, "0")}</strong>
                 `;
 
-                // 👉 your action (example)
-                if (minutes === 0 && seconds === 0) {
-                    console.log("Expired");
+                    // 👉 your action (example)
+                    if (minutes === 0 && seconds === 0) {
+                        console.log("Expired");
+                    }
+                } else {
+                    timerEl.innerHTML = ""; // hide before last 5 minutes
                 }
-            } else {
-                timerEl.innerHTML = ""; // hide before last 5 minutes
-            }
 
-        }, 1000);
-    }
+            }, 1000);
+        }
 
-    startTimer();
-
+        startTimer();
     </script>
 </body>
 

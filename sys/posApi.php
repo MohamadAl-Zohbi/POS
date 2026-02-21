@@ -1,5 +1,7 @@
 <?php
 include_once "../common/connect.php";
+include_once './checkLogin.php';
+
 header("Content-Type: application/json");
 
 // Allow only POST requests
@@ -25,7 +27,7 @@ $dollar;
 $saleID;
 $customerId;
 
-session_start();
+// session_start();
 $selectUser = $db->prepare("SELECT * FROM users WHERE username = :username");
 $selectUser->bindParam(':username', $_SESSION['username']);
 if ($selectUser->execute()) {
@@ -118,7 +120,20 @@ if ($addSale->execute()) {
 
 $sql = "INSERT INTO sale_items(sale_id,product_id,quantity,unit_price,currency,date) VALUES";
 
+$sqlMinus = "UPDATE products SET stock_quantity = CASE";
+$ar = array();
 // prepare the main query
+
+//
+// UPDATE products
+// SET price = CASE
+//     WHEN id = 1 THEN 10
+//     WHEN id = 2 THEN 15
+//     WHEN id = 3 THEN 20
+// END
+// WHERE id IN (1, 2, 3);
+//
+
 
 $index = 0;
 foreach ($data['items'] as $i => $item) {
@@ -127,6 +142,7 @@ foreach ($data['items'] as $i => $item) {
     $quantity = $item["qty"];
     $price = $item["price"];
     $currency = $item["currency"];
+    array_push($ar, $productID);
     // $sql .= "cx";
     // saleid
     if ($index == 1) {
@@ -134,7 +150,19 @@ foreach ($data['items'] as $i => $item) {
     } else {
         $sql .= ",(" . $saleID . "," . $productID . "," . $quantity . ',' . $price . ',"' . $currency . '","' . $date . '")';
     }
+    $sqlMinus .= " WHEN id = $productID THEN stock_quantity - $quantity ";
 }
+$sqlMinus .= "END WHERE id IN (";
+foreach ($ar as $i => $item) {
+    $sqlMinus .= $i == count($ar) - 2 ? "$item,":"$item";
+}
+$sqlMinus .= ");";
+
+$editQtc = $db->prepare($sqlMinus);
+if($editQtc->execute()){
+
+}
+
 
 $addSalesLines = $db->prepare($sql);
 if (!$addSalesLines->execute()) {
@@ -142,5 +170,5 @@ if (!$addSalesLines->execute()) {
 }
 // Send response
 //done
-echo json_encode(['details' => "done"]);
+echo json_encode(['details' => "done","ar" =>$sqlMinus]);
 // exit;
