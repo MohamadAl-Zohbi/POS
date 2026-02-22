@@ -114,9 +114,9 @@ if ($categories->execute()) {
     <?php include_once "./navbar.php" ?>
     <div class="container">
         <br>
-        <form method="POST" enctype="multipart/form-data" class="mb-4 row g-2">
+        <form method="POST" enctype="multipart/form-data" class="row g-2">
             <div class="col-md-2"><input type="text" name="name" placeholder="الاسم" class="form-control" required></div>
-            <div class="col-md-2"><input type="text" name="barcode" placeholder="باركود" class="form-control" required></div>
+            <div class="col-md-1"><input type="text" name="barcode" placeholder="باركود" class="form-control" required></div>
             <div class="col-md-1"><input id="addPrice" type="number" step="0.01" name="price" placeholder="السعر" class="form-control" required>
                 <label id="addPriceLabel">
 
@@ -161,6 +161,12 @@ if ($categories->execute()) {
 
             <div class="col-md-2"><button type="submit" name="add_product" class="btn btn-primary w-100">Add Product</button></div>
         </form>
+        <nav class="navbar navbar-light bg-light">
+            <input class="form-control mr-sm-2" id="searchProducts" type="search" placeholder="ابحث عن المنتج">
+            <br>
+            <br>
+            <button onclick="printReport()">طباعة</button>
+        </nav>
         <table class="table table-bordered table-striped">
             <thead class="table-dark">
                 <tr>
@@ -176,7 +182,7 @@ if ($categories->execute()) {
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="productTable">
                 <?php
                 foreach ($data as $i => $item) {
                     echo "<tr>";
@@ -190,7 +196,7 @@ if ($categories->execute()) {
                     echo '<td>' . $item["stock_quantity"] . '</td>';
                     echo '<td>' . $item["category"] . '</td>';
                     echo '<td><a href="?delete=' . $item['id'] . '" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure?\')">Delete</a> &nbsp;';
-                    echo '<a data-category="' . $item["category"] . '" data-id=' . $item['id'] . ' data-stock_quantity="' . $item["stock_quantity"] . '" data-name="' . $item["name"] . '" data-currency="' . $item["currency"] . '" data-barcode="' . $item["barcode"] . '" data-price="' . $item["price"] . '" data-cost_price="' . $item["cost_price"] . '" class="btn btn-secondary btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editProductModal" onclick="showDataBeforeEdit(this)">Edit</a>&nbsp;
+                    echo '<a data-category="' . $item["category"] . '" data-id=' . $item['id'] . ' data-stock_quantity="' . $item["stock_quantity"] . '" data-name="' . $item["name"] . '" data-currency="' . $item["currency"] . '" data-barcode="' . $item["barcode"] . '" data-price="' . $item["price"] . '" data-cost_price="' . $item["cost_price"] . '" data-img="' . $item["img"] . '" class="btn btn-secondary btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editProductModal" onclick="showDataBeforeEdit(this)">Edit</a>&nbsp;
                     <a class="btn btn-secondary btn-sm btn-primary" onclick="editStockDetails(' . $item['id'] . ')">Add</a>
                     </td>';
                     echo "</tr>";
@@ -200,7 +206,7 @@ if ($categories->execute()) {
         </table>
     </div>
     <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
-        <form action="editProduct.php" method="GET">
+        <form action="editProduct.php" enctype="multipart/form-data" method="POST">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -267,6 +273,15 @@ if ($categories->execute()) {
                                 ?>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <!-- Preview -->
+                            <div class="mb-3">
+                                <label for="img" class="form-label">الصورة</label>
+                                <input type="file" class="form-control" name="img">
+                                <br>
+                                <img id="imgPreview" name="imgPreview" src="../uploads/" alt="No Img" class="img-thumbnail" style="max-width: 200px;">
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" name="editProduct" class="btn btn-primary">حفظ التغييرات</button>
@@ -279,6 +294,9 @@ if ($categories->execute()) {
 </body>
 <script src="../common/bootstrap.js"></script>
 <script>
+    const data = <?php echo json_encode($data) ?>;
+    let dataSave = <?php echo json_encode($data) ?>;
+
     function showDataBeforeEdit(e) {
         let productId = document.getElementById("productId");
         let productName = document.getElementById("productName");
@@ -288,6 +306,7 @@ if ($categories->execute()) {
         let stockQtc = document.getElementById("stockQtc");
         let category = document.getElementById("category");
         let currency = document.getElementById("currency");
+        let img = document.getElementById("imgPreview");
 
         productId.value = e.dataset.id
         productName.value = e.dataset.name
@@ -297,6 +316,8 @@ if ($categories->execute()) {
         stockQtc.value = e.dataset.stock_quantity
         category.value = e.dataset.category
         currency.value = e.dataset.currency
+        img.src = "../uploads/" + e.dataset.img
+
     }
     let urlParams = new URLSearchParams(window.location.search);
     onload = () => {
@@ -315,6 +336,36 @@ if ($categories->execute()) {
         document.getElementById("sessionCurrency").addEventListener("change", () => {
             sessionStorage.setItem("currency", document.getElementById("sessionCurrency").value);
         });
+
+        document.getElementById("searchProducts").addEventListener("change", () => {
+            const table = document.getElementById("productTable");
+            table.innerHTML = "";
+            const filtredData = searchProducts(document.getElementById("searchProducts").value);
+            dataSave = filtredData;
+            if (!filtredData.length) return;
+            // const headerRow = document.createElement("tr");
+
+            filtredData.forEach((item, i) => {
+                table.innerHTML += `
+                 <tr>
+             <td> ${i+1}</td>
+             <td>${item["id"]}</td>
+             <td>${item["name"]}</td>
+             <td>${item["barcode"]}</td>
+             <td>${Number(item["price"]).toFixed(2)}</td>
+             <td>${Number(item["cost_price"]).toFixed(2)}</td>
+             <td>${item["currency"]}</td>
+             <td>${item["stock_quantity"]}</td>
+             <td>${item["category"]}</td>
+             <td><a href="?delete=${item['id']}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a> &nbsp;
+             <a data-category="${item["category"]}" data-id=${item['id']} data-stock_quantity="${item["stock_quantity"]}" data-name="${item["name"]}" data-currency="${item["currency"]}" data-barcode="${item["barcode"]}" data-price="${item["price"]}" data-cost_price="${item["cost_price"]}" data-img="${item["img"]}" class="btn btn-secondary btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editProductModal" onclick="showDataBeforeEdit(this)">Edit</a>&nbsp;
+             <a class="btn btn-secondary btn-sm btn-primary" onclick="editStockDetails(${item['id']})">Add</a>
+             </td>
+             </tr>
+            `
+            });
+        });
+
     }
 
     function editStockDetails(id) {
@@ -327,9 +378,22 @@ if ($categories->execute()) {
         }
         let url = "?qtc=" + qtc + "&qtcId=" + id;
         window.location.href = url;
+    }
 
-        console.log(qtc)
+    function searchProducts(searchTerm) {
+        const term = searchTerm.toString().toLowerCase();
 
+        return data.filter(product => {
+            return Object.values(product).some(value =>
+                value !== null &&
+                value.toString().toLowerCase().includes(term)
+            );
+        });
+    }
+
+    function printReport() {
+        localStorage.setItem("reportData", JSON.stringify(dataSave));
+        window.open("../common/productsPrint.html", "_blank");
     }
 </script>
 

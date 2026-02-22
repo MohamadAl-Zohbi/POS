@@ -46,15 +46,23 @@ function validateInput($input, $type, $min = null, $max = null)
     }
 }
 
-if (isset($_GET['editProduct'])) {
-    $name = $_GET['productName'];
-    $barcode = $_GET['barcode'];
-    $cost_price = $_GET['costPrice'];
-    $price = $_GET['price'];
-    $stock_quantity = $_GET['stockQuantity'];
-    $category = $_GET['categoryId'];
-    $currency = $_GET['currency'];
-    $id  = $_GET['productId'];
+if (isset($_POST['editProduct'])) {
+    $name = $_POST['productName'];
+    $barcode = $_POST['barcode'];
+    $cost_price = $_POST['costPrice'];
+    $price = $_POST['price'];
+    $stock_quantity = $_POST['stockQuantity'];
+    $category = $_POST['categoryId'];
+    $currency = $_POST['currency'];
+    $id  = $_POST['productId'];
+    $img = "";
+    if (isset($_FILES['img']) && $_FILES['img']['error'] === 0) {
+        $img = time() . "_" . $_FILES['img']['name'];
+        $targetPath = "../uploads/" . $img;
+        if (!move_uploaded_file($_FILES['img']['tmp_name'], $targetPath)) {
+            die("Upload failed");
+        }
+    }
 
     if (!validateInput($cost_price, 'float')) {
         header("Location: ./products.php?error=input error cost price should be a number");
@@ -64,7 +72,7 @@ if (isset($_GET['editProduct'])) {
         header("Location: ./products.php?error=input error stock quantity should be a number");
     }
 
-    $sql = "UPDATE products SET name = :name, barcode = :barcode, price = :price, cost_price = :costprice, stock_quantity = :stock_quantity, category = :category, currency = :currency WHERE id = :id";
+    $sql = "UPDATE products SET name = :name, barcode = :barcode, price = :price, cost_price = :costprice, stock_quantity = :stock_quantity, category = :category, currency = :currency, img=:img WHERE id = :id";
     $editProduct = $db->prepare($sql);
     $editProduct->bindParam(':name', $name);
     $editProduct->bindParam(':barcode', $barcode);
@@ -74,6 +82,7 @@ if (isset($_GET['editProduct'])) {
     $editProduct->bindParam(':category', $category);
     $editProduct->bindParam(':currency', $currency);
     $editProduct->bindParam(':id', $id);
+    $editProduct->bindParam(':img', $img);
     if ($editProduct->execute()) {
         header('Location: ./products.php');
     }

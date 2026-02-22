@@ -101,11 +101,11 @@ if ($getData->execute()) {
 
 <body>
     <div class="header">
-        <h2>SuperMarket <?php echo $data['company_name']?></h2>
-        <p><?php echo $data['address']?></p>
-        <p>Tel: <?php echo $data['tel']?></p>
+        <h2>SuperMarket <?php echo $data['company_name'] ?></h2>
+        <p><?php echo $data['address'] ?></p>
+        <p>Tel: <?php echo $data['tel'] ?></p>
         <p>Date: <?php date_default_timezone_set('Asia/Beirut');
- echo date("Y-m-d H:i:s");?></p>
+                    echo date("Y-m-d H:i:s"); ?></p>
     </div>
 
     <table>
@@ -183,6 +183,9 @@ if ($getData->execute()) {
 
         // Uncomment if you want it to auto-print
         window.print();
+        window.addEventListener("afterprint", function() {
+            window.close();
+        });
     </script>
 </body>
 

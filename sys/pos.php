@@ -52,19 +52,42 @@ if ($getDollar->execute()) {
 
 
     <style>
-        :root {
-            /* --primary: #007bff; */
+        /* :root {
+            --primary: #007bff;
             --primary: #7D3F6E;
 
             --category: #CE8EB3;
-            /* --category: #ddd; */
+            --category: #ddd;
             --category-text: #000;
-            /* --category-text: #000; */
+            --category-text: #000;
             --secondary: #5fa6f1;
-            /* --secondary: #5fa6f1; */
+            --secondary: #5fa6f1;
             --bg: #8F608C;
-            /* --bg: #f4f6f8; */
+            --bg: #f4f6f8;
             --text: #333;
+        } */
+
+        :root {
+            --primary: #111827;
+            /* Dark Navy */
+            --secondary: #1F2937;
+            /* Slight lighter dark */
+            --accent: #10B981;
+            /* Emerald Green */
+            --danger: #EF4444;
+            /* Red */
+            --warning: #F59E0B;
+            /* Amber */
+            --bg: #0F172A;
+            /* Deep Dark Blue */
+            --card: #1E293B;
+            /* Card background */
+            --category: #334155;
+            /* Product background */
+            --category-text: #F1F5F9;
+            /* Light text */
+            --text: #E5E7EB;
+            /* Main text */
         }
 
         * {
@@ -92,15 +115,15 @@ if ($getDollar->execute()) {
 
         header {
             background: var(--primary);
-            color: white;
+            color: var(--text);
             padding: 15px;
             text-align: center;
             font-size: 22px;
         }
 
-        header button {
+        /* header button {
             background-color: #d0ddea;
-        }
+        } */
 
         main {
             display: grid;
@@ -111,7 +134,8 @@ if ($getDollar->execute()) {
         }
 
         section {
-            background: #F2B3BE;
+            background: var(--card);
+            color: var(--category-text);
             border-radius: 8px;
             padding: 15px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -123,7 +147,7 @@ if ($getDollar->execute()) {
         .products h2,
         .cart h2,
         .tables h2 {
-            color: var(--primary);
+            color: var(--text);
             font-size: 18px;
             margin-bottom: 10px;
         }
@@ -236,7 +260,7 @@ if ($getDollar->execute()) {
         } */
         .remove-btn {
             background: red;
-            color: white;
+            color: var(--text);
             border: none;
             padding: 2px 6px;
             cursor: pointer;
@@ -259,14 +283,18 @@ if ($getDollar->execute()) {
             margin-top: 5px;
             width: 100%;
             background: var(--primary);
-            color: white;
+            color: var(--text);
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 0.5px;
         }
 
         button:hover {
-            background: #0056b3;
+            background: var(--secondary);
+            transform: scale(1.03);
+            transition: 0.2s;
         }
 
         .status {
@@ -288,7 +316,7 @@ if ($getDollar->execute()) {
         }
 
         .table {
-            background: #ddd;
+            background: var(--accent);
             padding: 8px;
             text-align: center;
             border-radius: 4px;
@@ -297,21 +325,21 @@ if ($getDollar->execute()) {
 
         .table.active {
             background: var(--primary);
-            color: white;
+            color: var(--text);
         }
 
         footer {
             text-align: center;
             font-size: 12px;
-            color: #777;
+            color: var(--text);
             padding: 8px;
         }
 
 
-        button:hover {
+        /* button:hover {
             background-color: blue !important;
             box-shadow: 1px 1px 0px 1px #007bff !important;
-        }
+        } */
 
         .modal-overlay {
             position: fixed;
@@ -327,7 +355,7 @@ if ($getDollar->execute()) {
         }
 
         .modal {
-            background-color: black;
+            background-color: var(--primary);
             padding: 20px 30px;
             border-radius: 8px;
             max-width: 400px;
@@ -356,12 +384,12 @@ if ($getDollar->execute()) {
 
         .btn-yes {
             background-color: #3498db;
-            color: white;
+            color: var(--text);
         }
 
         .btn-no {
             background-color: #e74c3c;
-            color: white;
+            color: var(--text);
         }
 
         .btn-yes:hover {
@@ -402,7 +430,7 @@ if ($getDollar->execute()) {
         .btn {
             padding: 12px 20px;
             background: #4b7bec;
-            color: #fff;
+            color: var(--text);
             border: none;
             border-radius: 6px;
             font-size: 16px;
@@ -411,7 +439,7 @@ if ($getDollar->execute()) {
         }
 
         .btn:hover {
-            background: #3867d6;
+            background: var(--primary);
         }
 
         /* Popup background */
@@ -439,7 +467,7 @@ if ($getDollar->execute()) {
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
             animation: slideUp 0.4s ease forwards;
             text-align: center;
-            color: white;
+            color: var(--text);
         }
 
         /* Options */
@@ -467,7 +495,7 @@ if ($getDollar->execute()) {
             padding: 10px 16px;
             background: #ff3f34;
             border: none;
-            color: white;
+            color: var(--text);
             border-radius: 5px;
             cursor: pointer;
             transition: 0.2s;
@@ -560,7 +588,7 @@ if ($getDollar->execute()) {
                     <div class="table">4</div>
                 </div>
                 <button onclick="save()">Save</button>
-                <button onclick="if(confirm('Are you sure?')){handleYes() }" style="background-color:#CE8EB3;color:white;">Clear All Tables</button>
+                <button onclick="if(confirm('Are you sure?')){handleYes() }">Clear All Tables</button>
 
             </div>
         </section>
@@ -571,7 +599,6 @@ if ($getDollar->execute()) {
 
             </table>
             <div class="status">
-                <label><input type="checkbox" id="paid"> Paid</label>
                 <span id="total">Total: 0</span>
             </div>
 
@@ -683,7 +710,7 @@ if ($getDollar->execute()) {
                 itemsDiv.appendChild(div);
             }
 
-            if (total === 0) itemsDiv.innerHTML = '<p style="color:#777; text-align:center;">Cart is empty</p>';
+            if (total === 0) itemsDiv.innerHTML = '<p style=" text-align:center;">Cart is empty</p>';
             document.getElementById('total').innerHTML = 'L.L ' + formatNumber(total.toFixed(2)) + '<br>$$ ' + formatNumber((total / usd).toFixed(2));
         }
 

@@ -124,17 +124,6 @@ $sqlMinus = "UPDATE products SET stock_quantity = CASE";
 $ar = array();
 // prepare the main query
 
-//
-// UPDATE products
-// SET price = CASE
-//     WHEN id = 1 THEN 10
-//     WHEN id = 2 THEN 15
-//     WHEN id = 3 THEN 20
-// END
-// WHERE id IN (1, 2, 3);
-//
-
-
 $index = 0;
 foreach ($data['items'] as $i => $item) {
     $index++;
@@ -159,8 +148,8 @@ foreach ($ar as $i => $item) {
 $sqlMinus .= ");";
 
 $editQtc = $db->prepare($sqlMinus);
-if($editQtc->execute()){
-
+if(!$editQtc->execute()){
+    echo json_encode(['we have a problem in edit qtc']);
 }
 
 

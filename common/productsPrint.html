@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Product Report</title>
+
+    <style>
+        * {
+            padding: 5px;
+        }
+        
+        body {
+            font-family: monospace;
+            width: 80mm;
+            margin: 0 auto;
+            font-size: 12px;
+        }
+        
+        .center {
+            text-align: center;
+        }
+        
+        .line {
+            border-top: 1px dashed #000;
+            margin: 5px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th,
+        td {
+            text-align: left;
+            padding: 2px 0;
+        }
+        
+        .right {
+            text-align: right;
+        }
+        
+        @media print {
+            body {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="center">
+        <!-- <h3>YOUR STORE NAME</h3>-->
+        <div>Product Report</div>
+        <div id="date"></div>
+    </div>
+
+    <div class="line"></div>
+
+    <table id="reportTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th class="right">Qty</th>
+                <!-- <th class="right">Price</th> -->
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div class="line"></div>
+
+    <!-- <div class="right">
+        Total: <span id="total"></span>
+    </div> -->
+
+    <script>
+        const products = JSON.parse(localStorage.getItem("reportData")) || [];
+
+        const tbody = document.querySelector("#reportTable tbody");
+        let total = 0;
+
+        products.forEach(p => {
+            const row = `
+            <tr>
+                <td>${p.name}</td>
+                <td class="right">${p.stock_quantity}</td>
+            </tr>
+        `;
+            tbody.innerHTML += row;
+
+            total += p.price * p.stock_quantity;
+        });
+
+        document.getElementById("date").textContent = new Date().toLocaleString();
+
+        // Auto print
+        window.onload = () => {
+            window.print();
+            // window.close();
+        };
+    </script>
+
+</body>
+
+</html>
