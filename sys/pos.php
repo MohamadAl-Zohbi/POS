@@ -862,7 +862,11 @@ if ($getDollar->execute()) {
                 productsWithCategory.forEach(item => {
                     document.getElementById("product-list").innerHTML +=
                         `
-                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-id="${item['id']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
+                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-id="${item['id']}" data-price="${item['price']}">${item['name']}<br>${item['price']}
+                <div>
+                    ${item['img'] ? "<img src='../uploads/"+item['img']+"' width='100' height='100'/>":""}
+                </div>
+                </div>
                 `;
                 });
                 document.querySelectorAll('.product').forEach(prod => {
@@ -877,7 +881,11 @@ if ($getDollar->execute()) {
             printProductCategoryInTheCart.forEach(item => {
                 document.getElementById("product-list").innerHTML +=
                     `
-                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-id="${item['id']}" data-price="${item['price']}">${item['name']}<br>${item['price']}</div>
+                <div class="product" data-name="${item['name']}" data-currency="${item['currency']}" data-id="${item['id']}" data-price="${item['price']}">${item['name']}<br>${item['price']}
+                <div>
+                    ${item['img'] ? "<img src='../uploads/"+item['img']+"' width='100' height='100'/>":""}
+                </div>
+                </div>
                 `;
             });
 

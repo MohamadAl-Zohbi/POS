@@ -1,0 +1,29 @@
+[{
+        "category": "Hot Drinks",
+        "items": [{
+                "name": "Espresso",
+                "price": 2,
+                "image": "images/espresso.jfif"
+            },
+            {
+                "name": "Cappuccino",
+                "price": 3,
+                "image": "images/cappuccino.avif"
+            }
+        ]
+    },
+    {
+        "category": "Cake",
+        "items": [{
+                "name": "Espresso",
+                "price": 2,
+                "image": "images/espresso.jfif"
+            },
+            {
+                "name": "Cappuccino",
+                "price": 3,
+                "image": "images/cappuccino.avif"
+            }
+        ]
+    }
+]
