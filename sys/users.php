@@ -11,7 +11,7 @@ if (isset($_POST['add_user'])) {
     $addUser->bindParam(':username', $username);
     $addUser->bindParam(':password', $password);
     $addUser->bindParam(':role', $role);
-    $addUser->bindParam(':is_freez', $is_freez);
+    // $addUser->bindParam(':is_freez', $is_freez);
     if ($addUser->execute()) {
         header('Location: users.php');
     }
