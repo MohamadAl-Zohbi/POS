@@ -143,7 +143,7 @@ if (isset($_GET['search'])) {
                     </div>
 
                     <?php
-                    foreach ($saleCardDetails as $i => $item) {
+                    foreach ($salesSelect as $i => $item) {
                         echo `<div class="mb-3" style="text-align: center;">
                         <label for="saleId" class="form-label">المعرف</label>
                         <input value="` . $item['date'] . `" readonly style="max-width: 500px; margin:auto;text-align:center;" type="text" class="form-control" id="id" placeholder="المعرف">
